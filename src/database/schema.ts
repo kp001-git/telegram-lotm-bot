@@ -59,6 +59,11 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       voted_at TEXT,
       PRIMARY KEY (poll_id, user_id)
     );`,
+    `CREATE TABLE IF NOT EXISTS authorized_chats (
+      chat_id INTEGER PRIMARY KEY,
+      title TEXT,
+      approved_at TEXT
+    );`,
     `CREATE TABLE IF NOT EXISTS system_config (
       key TEXT PRIMARY KEY,
       value TEXT,

@@ -10,6 +10,8 @@ import { registerAuthorityCommands } from "./commands/authority";
 import { registerBoardCommands } from "./commands/board";
 import { registerGovernanceCommands } from "./commands/governance";
 import { registerMysticalCommands } from "./commands/mystical";
+import { sanctuaryRepository } from "./database/repositories/sanctuary.repository";
+import { UNAUTHORIZED_GROUP_MESSAGE } from "./middlewares/guard";
 
 export function createBot(): Bot<MyContext> {
   // Guarantee IPv4 sockets for all Telegram API calls on Render/Cloud environments
@@ -27,25 +29,70 @@ export function createBot(): Bot<MyContext> {
   // 1. Hydrate plugin for convenient message methods
   bot.use(hydrate());
 
-  // 2. Throttled user synchronization with Turso
+  // 2. Whitelist Gatekeeper: Group auto-exit guard for unauthorized groups
+  bot.use(async (ctx, next) => {
+    const chat = ctx.chat;
+    if (chat && (chat.type === "group" || chat.type === "supergroup")) {
+      const isAuthorized = await sanctuaryRepository.isChatAuthorized(chat.id);
+      if (!isAuthorized) {
+        try {
+          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, { parse_mode: "HTML" });
+        } catch (err) {
+          console.warn(`[gatekeeper] Failed to send exit message to ${chat.id}:`, err);
+        }
+        try {
+          await ctx.leaveChat();
+        } catch (err) {
+          console.warn(`[gatekeeper] Failed to leave chat ${chat.id}:`, err);
+        }
+        return;
+      }
+    }
+    await next();
+  });
+
+  // 3. Whitelist Gatekeeper: Listen for bot being added to a group/supergroup
+  bot.on("my_chat_member", async (ctx) => {
+    const chat = ctx.chat;
+    if (!chat || (chat.type !== "group" && chat.type !== "supergroup")) return;
+
+    const newStatus = ctx.myChatMember.new_chat_member.status;
+    if (newStatus === "member" || newStatus === "administrator") {
+      const isAuthorized = await sanctuaryRepository.isChatAuthorized(chat.id);
+      if (!isAuthorized) {
+        try {
+          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, { parse_mode: "HTML" });
+        } catch (err) {
+          console.warn(`[gatekeeper] Failed to send exit message to ${chat.id}:`, err);
+        }
+        try {
+          await ctx.leaveChat();
+        } catch (err) {
+          console.warn(`[gatekeeper] Failed to leave chat ${chat.id}:`, err);
+        }
+      }
+    }
+  });
+
+  // 4. Throttled user synchronization with Turso
   bot.use(userSyncMiddleware);
 
-  // 3. Role-Based Access Control resolver
+  // 5. Role-Based Access Control resolver
   bot.use(rbacMiddleware);
 
-  // 4. Authority & Moderation Commands
+  // 6. Authority & Moderation Commands
   registerAuthorityCommands(bot);
 
-  // 5. Board, Information & Welcome Listener
+  // 7. Board, Information & Welcome Listener
   registerBoardCommands(bot);
 
-  // 6. Member Participation, Suggestions & Voting Engine
+  // 8. Member Participation, Suggestions & Voting Engine
   registerGovernanceCommands(bot);
 
-  // 7. Mystical Lore, Pathways, Tarot & Rituals
+  // 9. Mystical Lore, Pathways, Tarot & Rituals
   registerMysticalCommands(bot);
 
-  // 8. Global error handling
+  // 10. Global error handling
   bot.catch(errorHandler);
 
   return bot;

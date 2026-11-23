@@ -56,10 +56,11 @@ async function startBotWithRetry(
       // Sync Telegram command menu
       await setupBotCommands(bot);
 
-      // Start Polling with drop_pending_updates: true
+      // Start Polling with drop_pending_updates: true and explicit allowed_updates
       console.log("[Polling] Actively receiving spiritual whispers (updates)...");
       await bot.start({
         drop_pending_updates: true,
+        allowed_updates: ["message", "callback_query", "my_chat_member", "chat_member"],
         onStart: () => {
           console.log("[Polling] Connection confirmed. The sanctuary is active.");
         },

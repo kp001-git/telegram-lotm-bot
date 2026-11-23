@@ -10,6 +10,7 @@ import { userCache } from "../src/middlewares/cache";
 import { canActOnTarget, parseDuration } from "../src/utils/resolver";
 import { renderWelcomeTemplate } from "../src/commands/board/summoning";
 import { cooldownManager } from "../src/utils/cooldown";
+import { sanctuaryRepository } from "../src/database/repositories/sanctuary.repository";
 import { createHealthServer } from "../src/index";
 import pathwaysData from "../src/data/pathways.json";
 import tarotData from "../src/data/tarot_cards.json";
@@ -27,6 +28,10 @@ async function runTests() {
   });
   await client.execute({
     sql: `DELETE FROM group_settings WHERE chat_id IN (-1009876543, -100111222, -1001234567);`,
+    args: [],
+  });
+  await client.execute({
+    sql: `DELETE FROM authorized_chats WHERE chat_id IN (-100555666777, -999888777);`,
     args: [],
   });
   console.log("✔ Schema initialized and test state prepared.");
@@ -342,6 +347,37 @@ async function runTests() {
     throw new Error(`Health server assertion failed: ${JSON.stringify(healthRes)}`);
   }
   console.log("✔ Native HTTP health endpoint (/health) verified.");
+
+  // 22. Group Whitelist Gatekeeper (isChatAuthorized)
+  sanctuaryRepository.clearCache();
+  const unapprovedChatId = -999888777;
+  const isUnapproved = await sanctuaryRepository.isChatAuthorized(unapprovedChatId);
+  if (isUnapproved) {
+    throw new Error(`Expected unauthorized chat to return false, got true for ${unapprovedChatId}`);
+  }
+
+  const approvedChatId = -100555666777;
+  await sanctuaryRepository.authorizeChat(approvedChatId, "Tarot Club Sanctuary");
+  const isApproved = await sanctuaryRepository.isChatAuthorized(approvedChatId);
+  if (!isApproved) {
+    throw new Error(`Expected authorized chat to return true, got false for ${approvedChatId}`);
+  }
+
+  // Verify memory cache hit (reloaded after clearing cache)
+  sanctuaryRepository.clearCache();
+  const isApprovedReloaded = await sanctuaryRepository.isChatAuthorized(approvedChatId);
+  if (!isApprovedReloaded) {
+    throw new Error(`Expected reloaded authorized chat from Turso to return true`);
+  }
+
+  // Clean up test chat and verify negative state
+  await sanctuaryRepository.deauthorizeChat(approvedChatId);
+  sanctuaryRepository.clearCache();
+  const isDeauthorized = await sanctuaryRepository.isChatAuthorized(approvedChatId);
+  if (isDeauthorized) {
+    throw new Error(`Expected deauthorized chat to return false`);
+  }
+  console.log("✔ Group Whitelist Gatekeeper (isChatAuthorized) verified.");
 
   console.log("\n𓆩 All Phase 1, 2, 3, 4 & 5 Verification Tests Passed Flawlessly! 𓆪\n");
 }
