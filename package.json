@@ -1,0 +1,22 @@
+{
+  "name": "telegram-lotm-bot",
+  "version": "1.0.0",
+  "description": "LOTM themed Telegram group management and community bot",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@grammyjs/hydrate": "^1.7.0",
+    "@libsql/client": "^0.18.0",
+    "dotenv": "^18.0.10",
+    "grammy": "^1.48.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

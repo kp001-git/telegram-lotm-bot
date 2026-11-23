@@ -1,0 +1,76 @@
+{
+  "fate_omens": [
+    {
+      "rating": "Blessed by The Fool",
+      "title": "Historical Void Auspice",
+      "prophecy": "The golden coin of luck spins in your favor. An elusive miracle stirs in the historical void; opportunities once deemed lost shall present themselves before twilight."
+    },
+    {
+      "rating": "Auspicious Resonance",
+      "title": "Sunlight Piercing the Fog",
+      "prophecy": "Purifying light descends upon your path. Spiritual obstacles disperse like morning mist, and allies will respond warmly to your invocations."
+    },
+    {
+      "rating": "Misty Uncertainty",
+      "title": "Whispers of the Spirit World",
+      "prophecy": "The pendulum swings in erratic spirals. Multiple divergent futures entwine in the fog; avoid hasty commitments and scrutinize the fine print of contracts."
+    },
+    {
+      "rating": "Auspicious Resonance",
+      "title": "Ouroboros Alignment",
+      "prophecy": "The silver snake bites its tail. A cyclical turn of fate brings recompense for past devotion; expect sudden serendipity in unexpected encounters."
+    },
+    {
+      "rating": "Misty Uncertainty",
+      "title": "Veiled Threshold",
+      "prophecy": "A closed door stands before your spiritual sight. Knowledge lies beyond, but the cost of the key remains unrevealed. Maintain your anchor."
+    },
+    {
+      "rating": "Crimson Warning",
+      "title": "Nocturnal Hallucination",
+      "prophecy": "Crimson moonlight glimmers with unrest. Taboo whispers seek to breach your spiritual defenses; refrain from reckless divination and guard your thoughts."
+    },
+    {
+      "rating": "Crimson Warning",
+      "title": "Distorted Law Reflection",
+      "prophecy": "The scales of fate lean toward entropy. Beware of subtle deception and legalistic traps in mortal dealings over the coming dawn."
+    },
+    {
+      "rating": "Blessed by The Fool",
+      "title": "Attendant's Blessing",
+      "prophecy": "The fog parts above the bronze table. Your devotion has resonated with the Ruler of the Mysteries. Good luck shall shield you from sudden calamity."
+    }
+  ],
+  "ritual_events": [
+    {
+      "id": "spirit_convergence",
+      "title": "Spirit World Convergence",
+      "description": "The boundaries between the mortal sanctuary and the Spirit World grow paper-thin. Phantasmal seven-colored lights shimmer above the gathering, vibrating with ancient mystical frequencies.",
+      "aura": "Iridescent Spiritual Vibrations"
+    },
+    {
+      "id": "fog_fluctuation",
+      "title": "Fog Fluctuation of Sefirah Castle",
+      "description": "Thick, boundless Grey Fog surges through the sanctuary hall. In the distance, the silhouette of twenty-two majestic high-backed chairs materializes around an ancient mottled bronze table.",
+      "aura": "Veiled Primordial Stillness"
+    },
+    {
+      "id": "crimson_omen",
+      "title": "Crimson Moon Alignment",
+      "description": "A radiant scarlet halo illuminates the heavens. The nocturnal spirituality of all Beyonders peaks as ancient lunar currents course through the gathering.",
+      "aura": "Scarlet Vitality & Mystical Keenness"
+    },
+    {
+      "id": "astral_projection",
+      "title": "Astral Tide Resonance",
+      "description": "A celestial wind blows across the spiritual sea. Ethereal constellations align above the ceiling, granting assembled seekers elevated clarity and heightened intuition.",
+      "aura": "Starlight Clarity & Clairvoyance"
+    },
+    {
+      "id": "void_ripple",
+      "title": "Historical Void Echo",
+      "description": "A gentle ripple passes through the historical void. Faint projections of ancient Beyonder relics and forgotten incantations brush past the consciousness of the assembly.",
+      "aura": "Ancient Echo of Forgotten Epochs"
+    }
+  ]
+}

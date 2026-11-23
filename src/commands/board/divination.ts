@@ -1,0 +1,50 @@
+import { MyContext } from "../../middlewares/context";
+import { formatHeader, formatDivider } from "../../utils/formatters";
+
+export async function divinationCommand(ctx: MyContext): Promise<void> {
+  const content = [
+    formatHeader("Astrological Divination Directory"),
+    `<i>The revelations and incantations permitted within the domain of the Grey Fog.</i>`,
+    formatDivider(),
+    `🏛 <b>Authority & Moderation</b>`,
+    ` • <code>/celestial_worthy</code> — Supreme owner dossier and awakening`,
+    ` • <code>/council</code> — Tarot Club administrative hierarchy`,
+    ` • <code>/ascend</code> — Promote Beyonder to council seat`,
+    ` • <code>/degrade</code> — Demote council member to Beyonder`,
+    ` • <code>/banish</code> — Permanently sever entity from sanctuary`,
+    ` • <code>/exile</code> — Cast entity beyond sanctuary borders`,
+    ` • <code>/silence</code> — Mute voice in the Grey Fog`,
+    ` • <code>/release</code> — Lift silence from Beyonder`,
+    ` • <code>/seal</code> — Seal sanctuary from mundane speech`,
+    ` • <code>/unseal</code> — Lift divine silence from chat`,
+    ` • <code>/erase</code> — Purge heretical blasphemy and messages`,
+    "",
+    `📜 <b>Information & Board</b>`,
+    ` • <code>/divination</code> — Astrological directory of divine commands`,
+    ` • <code>/sacred_laws</code> — View or set sacred decrees`,
+    ` • <code>/mysteries</code> — Live overview of sanctuary domain`,
+    ` • <code>/fate_records</code> — Activity ledger and top Beyonders`,
+    ` • <code>/summoning</code> — Preview or set welcoming rites`,
+    ` • <code>/lore</code> — Chronicles and ethos of Grey Fog`,
+    "",
+    `⚖ <b>Member Participation & Governance</b>`,
+    ` • <code>/suggest</code> — Submit feature proposals to Council`,
+    ` • <code>/idea</code> — Propose community events and initiatives`,
+    ` • <code>/report</code> — Report bugs or anomalies to Council`,
+    ` • <code>/vote</code> — Participate in or create deliberations`,
+    ` • <code>/suggestions</code> — View approved development ledger`,
+    "",
+    `🔮 <b>Mystical Lore & Rituals</b>`,
+    ` • <code>/pathway</code> — Inquire or choose from 22 pathways`,
+    ` • <code>/sequence</code> — Inquire sequence hierarchy and rank`,
+    ` • <code>/potion</code> — Retrieve formulas and acting methods`,
+    ` • <code>/tarot</code> — Draw guidance from Major Arcana`,
+    ` • <code>/fate</code> — Spirit pendulum fortune and prophecy`,
+    ` • <code>/prayer</code> — Recite supplication to The Fool`,
+    ` • <code>/ritual</code> — Convoke interactive Grey Fog ceremony`,
+    formatDivider(),
+    `<i>"The spirit world guides those who seek with reverence."</i>`,
+  ].join("\n");
+
+  await ctx.reply(content, { parse_mode: "HTML" });
+}

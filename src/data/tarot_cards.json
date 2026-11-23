@@ -1,0 +1,178 @@
+[
+  {
+    "card": "0 - The Fool",
+    "arcana_number": 0,
+    "lotm_association": "The Ruler above the Gray Fog; Klein Moretti",
+    "upright": "Spontaneous miracles, divine beginnings, boundless potential, venturing into the historical void with innocent audacity.",
+    "reversed": "Reckless foolishness, catastrophic loss of anchor, blind arrogance, tumbling into cosmic madness.",
+    "guidance": "Step forward into the unknown with reverence. Preparation turns peril into a stage performance."
+  },
+  {
+    "card": "I - The Magician",
+    "arcana_number": 1,
+    "lotm_association": "Tarot Club Arcana Archivist; Fors Wall",
+    "upright": "Resourcefulness, mastery of mystical arts, deliberate preparation, sudden dramatic turns of fortune.",
+    "reversed": "Procrastination, hesitation before danger, illusory trickery, squandered opportunities.",
+    "guidance": "Never perform unprepared. Manifest your intent before taking decisive action."
+  },
+  {
+    "card": "II - The High Priestess",
+    "arcana_number": 2,
+    "lotm_association": "Evernight Goddess; Amanises",
+    "upright": "Intuitive insight, sacred concealment, quiet wisdom, protection in profound darkness.",
+    "reversed": "Hidden malice, suppressed secrets coming to light, spiritual blindness, deceit veiled in quietude.",
+    "guidance": "Trust your inner spiritual premonitions. Some truths are meant to be kept safely veiled."
+  },
+  {
+    "card": "III - The Empress",
+    "arcana_number": 3,
+    "lotm_association": "Mother Goddess of Depravity / Earth Mother",
+    "upright": "Fertility, boundless vitality, nurturing creation, harvest of enduring labor.",
+    "reversed": "Suffocating overgrowth, parasitic attachment, loss of self-restraint, hollow creation.",
+    "guidance": "Nurture what sustains your humanity. Protect your spiritual seedlings from barren soil."
+  },
+  {
+    "card": "IV - The Emperor",
+    "arcana_number": 4,
+    "lotm_association": "Roselle Gustav; Creator of Tarot Club Arcana Cards",
+    "upright": "Industrial mastery, imperial authority, transformative innovation, establishing unshakeable order.",
+    "reversed": "Despotic corruption, tragic hubris, crumbling empires, falling prey to unseen corruption.",
+    "guidance": "Build foundations with discernment. Even the greatest empire falls if built on tainted ground."
+  },
+  {
+    "card": "V - The Hierophant",
+    "arcana_number": 5,
+    "lotm_association": "Lord of Storms / Orthodoxy of the Seven Churches",
+    "upright": "Spiritual traditions, orthodox guidance, divine anchors, collective solidarity.",
+    "reversed": "Dogmatic intolerance, blind fanaticism, archaic restrictions that strangle advancement.",
+    "guidance": "Anchor yourself in shared humanity and collective creed when the spirit world trembles."
+  },
+  {
+    "card": "VI - The Lovers",
+    "arcana_number": 6,
+    "lotm_association": "The Tree of Desire / Emotional Anchors",
+    "upright": "Profound harmony, crucial moral decisions, symbiotic partnerships, divine resonance.",
+    "reversed": "Fatal temptation, compromised principles, divided loyalties, ensnared by forbidden desires.",
+    "guidance": "Choose the path that honors your fundamental humanity rather than fleeting instinct."
+  },
+  {
+    "card": "VII - The Chariot",
+    "arcana_number": 7,
+    "lotm_association": "Lumian Lee / Iron-Blooded Hunter",
+    "upright": "Triumphant conquest, fierce determination, overcoming adversity through focused resolve.",
+    "reversed": "Reckless momentum, self-destructive fury, losing control of raging steeds.",
+    "guidance": "Harness your inner fire. Victory belongs to those who direct wrath with icy calculation."
+  },
+  {
+    "card": "VIII - Strength",
+    "arcana_number": 8,
+    "lotm_association": "Miss Justice; Audrey Hall (Spectator Pathway)",
+    "upright": "Gentle psychological mastery, taming internal beasts, patient fortitude, compassion.",
+    "reversed": "Overcome by primal impulse, spiritual weakness, emotional manipulation, losing self-possession.",
+    "guidance": "True power lies not in brutal force, but in pacifying the turbulent beast within."
+  },
+  {
+    "card": "IX - The Hermit",
+    "arcana_number": 9,
+    "lotm_association": "Admiral of Stars; Cattleya (Mystery Pryer)",
+    "upright": "Deep esoteric contemplation, pursuit of taboo knowledge, solitude that illuminates truth.",
+    "reversed": "Paranoid isolation, overwhelmed by dangerous secrets, losing touch with reality.",
+    "guidance": "Seek wisdom in the quiet void, but remember that light requires an anchor in the world."
+  },
+  {
+    "card": "X - Wheel of Fortune",
+    "arcana_number": 10,
+    "lotm_association": "Will Auceptin; Ouroboros (Monster Pathway)",
+    "upright": "Destiny's turning tide, miraculous luck, cyclical reincarnation, auspicious convergence.",
+    "reversed": "Sudden misfortune, unavoidable calamity, running against the current of fate.",
+    "guidance": "Flow with destiny's cycles. What is low today shall rise when the wheel completes its turn."
+  },
+  {
+    "card": "XI - Justice",
+    "arcana_number": 11,
+    "lotm_association": "Xio Derecha; The Arbiter Seat",
+    "upright": "Equitable exchange, fair trial, upholding divine balance, objective truth.",
+    "reversed": "Biased judgment, hypocrisy, escaping consequences through corrupted loopholes.",
+    "guidance": "Honor the principle of Equivalent Exchange. Measure your actions on the honest scales of conscience."
+  },
+  {
+    "card": "XII - The Hanged Man",
+    "arcana_number": 12,
+    "lotm_association": "Alger Wilson; Pope of the Church of The Fool",
+    "upright": "Calculated sacrifice, shifting perspectives, endurance through humiliation, long-term vision.",
+    "reversed": "Martyrdom in vain, stubborn refusal to adapt, bitter resentment, betrayal.",
+    "guidance": "Endure the suspension. From an inverted viewpoint, the hidden path becomes crystalline."
+  },
+  {
+    "card": "XIII - Death",
+    "arcana_number": 13,
+    "lotm_association": "Azik Eggers; Underworld Consul",
+    "upright": "Profound transformation, necessary endings, shedding old skin, inevitable rebirth.",
+    "reversed": "Stagnant decay, clinging to deceased remnants, dread of inevitable change.",
+    "guidance": "Let what has expired pass into the underworld. Only through death can the soul find resurrection."
+  },
+  {
+    "card": "XIV - Temperance",
+    "arcana_number": 14,
+    "lotm_association": "Miss Sharron (Chained Pathway - Temperance Faction)",
+    "upright": "Restraint of dangerous desires, alchemical equilibrium, serene composure amidst madness.",
+    "reversed": "Unchecked indulgence, extreme polarization, rupture of emotional balance.",
+    "guidance": "Restrain the savage desires of the potion. Equilibrium is the shield against loss of control."
+  },
+  {
+    "card": "XV - The Devil",
+    "arcana_number": 15,
+    "lotm_association": "Abyss Pathway / The Blasphemy Slate",
+    "upright": "Confronting shadow self, raw primal instincts, breaking illusions of false security.",
+    "reversed": "Complete moral degradation, enslavement to outer deities, spiritual ruin.",
+    "guidance": "Acknowledge the darkness within without submitting to its whispers. Chains break only when seen."
+  },
+  {
+    "card": "XVI - The Tower",
+    "arcana_number": 16,
+    "lotm_association": "Cataclysm of the Third Epoch / Shattered Divine Thrones",
+    "upright": "Sudden cosmic awakening, shattering of false dogmas, catastrophic liberation.",
+    "reversed": "Averting disaster by narrow margin, clinging to collapsing illusions, delayed ruin.",
+    "guidance": "When the false tower falls, do not weep for the rubble. The sky above is finally clear."
+  },
+  {
+    "card": "XVII - The Star",
+    "arcana_number": 17,
+    "lotm_association": "Leonard Mitchell; Poet of the Red Gloves",
+    "upright": "Renewed inspiration, quiet optimism, celestial navigation, tranquil recovery.",
+    "reversed": "Hopeless despondency, cynicism, lost in spiritual fog without celestial guide.",
+    "guidance": "Look toward the crimson star above the Grey Fog. Even in deepest night, hope flickers."
+  },
+  {
+    "card": "XVIII - The Moon",
+    "arcana_number": 18,
+    "lotm_association": "Emlyn White; Sanguine Viscount",
+    "upright": "Subconscious depths, mystical dreams, lunar enchantments, unseen currents.",
+    "reversed": "Deceptive hallucinations, paranoia, preyed upon by nocturnal horrors.",
+    "guidance": "Walk carefully under the scarlet moonlight. The illusions of the spirit world are thickest at midnight."
+  },
+  {
+    "card": "XIX - The Sun",
+    "arcana_number": 19,
+    "lotm_association": "Derrick Berg; Sun of the Silver City",
+    "upright": "Blazing joy, banishment of ancient curses, radiant truth, glorious vitality.",
+    "reversed": "Scorching pride, temporary burnout, dazzling illusions masking real peril.",
+    "guidance": "Praise the Sun and radiate light into cursed ruins. Darkness recedes before steadfast conviction."
+  },
+  {
+    "card": "XX - Judgement",
+    "arcana_number": 20,
+    "lotm_association": "The Great Old Ones Awakening / Cosmic Reckoning",
+    "upright": "Spiritual rebirth, hearing the divine trumpet, absolute absolution, karmic realization.",
+    "reversed": "Self-recrimination, refusal to awaken, repeating ancestral curses, cosmic condemnation.",
+    "guidance": "Answer the spiritual call. The hour of awakening draws near; cast aside mortal doubts."
+  },
+  {
+    "card": "XXI - The World",
+    "arcana_number": 21,
+    "lotm_association": "Gehrman Sparrow; The Blessed of The Fool",
+    "upright": "Completion of the great work, mastery across dimensions, wholeness, fulfilling the divine decree.",
+    "reversed": "Incomplete ascension, lack of closure, lingering vulnerabilities at the threshold.",
+    "guidance": "You have traversed the sequences. Step forward into the banquet of the cosmos with cold resolve."
+  }
+]

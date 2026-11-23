@@ -1,0 +1,508 @@
+[
+  {
+    "name": "Fool Pathway",
+    "group": "Lord of the Mysteries",
+    "symbol": "Eye of Mystery & Concealment veiled in Grey Fog",
+    "authority": "Bizarre transformations, Marionettes, Divination, Historical Void, Miracles, Mysteries",
+    "sequences": {
+      "9": "Seer",
+      "8": "Clown",
+      "7": "Magician",
+      "6": "Faceless",
+      "5": "Marionettist",
+      "4": "Bizarro Sorcerer",
+      "3": "Scholar of Yore",
+      "2": "Miracle Invoker",
+      "1": "Attendant of Mysteries",
+      "0": "The Fool"
+    },
+    "potion_notes": {
+      "seq9": "Main: Lavos Squid blood & Stella Dahlia. Supplementary: Pure water, autumn fern. Acting: Inquire into the unknown with reverence; never boast complete foreknowledge.",
+      "seq8": "Main: Mutated crystal core & Hornacis gray ape marrow. Acting: Maintain composure and bring laughter while hiding inner pain behind the painted mask.",
+      "seq7": "Main: Rainbow Salamander crystal & Mist stalker powder. Acting: Never perform unprepared. Every miraculous escape is deliberate illusion."
+    }
+  },
+  {
+    "name": "Door Pathway",
+    "group": "Lord of the Mysteries",
+    "symbol": "Multi-layered Key of Stars opening cosmic thresholds",
+    "authority": "Spatial traversal, Portal opening, Concealment, Copying mystical abilities, Cosmic exile",
+    "sequences": {
+      "9": "Apprentice",
+      "8": "Trickmaster",
+      "7": "Astrologer",
+      "6": "Scribe",
+      "5": "Traveler",
+      "4": "Secrets Sorcerer",
+      "3": "Wanderer",
+      "2": "Planeswalker",
+      "1": "Key of Stars",
+      "0": "The Door"
+    },
+    "potion_notes": {
+      "seq9": "Main: Star gemstone & Void moth wing dust. Acting: Traverse boundaries, seek unseen portals, and understand the limits of physical entrapment.",
+      "seq8": "Main: Fox of Illusions tail & Phantom spirit dust. Acting: Master petty illusions and subvert expectations through subtle deception.",
+      "seq7": "Main: Crystal lotus & Starlight kelp. Acting: Read the patterns of celestial constellations and interpret cosmic omens."
+    }
+  },
+  {
+    "name": "Error Pathway",
+    "group": "Lord of the Mysteries",
+    "symbol": "Single monocle reflecting cracked cosmic timepieces",
+    "authority": "Parasitism, Theft of abilities, Destiny deceit, Temporal loopholes, Conceptual errors",
+    "sequences": {
+      "9": "Marauder",
+      "8": "Swindler",
+      "7": "Cryptologist",
+      "6": "Prompter",
+      "5": "Dream Stealer",
+      "4": "Parasite",
+      "3": "Mentor of Deceit",
+      "2": "Trojan Horse of Destiny",
+      "1": "Worm of Time",
+      "0": "The Error"
+    },
+    "potion_notes": {
+      "seq9": "Main: Quicksilver salamander eye & Shadow rabbit ear. Acting: Take what is guarded without notice; exploit vulnerabilities in mortal custody.",
+      "seq8": "Main: False tongue of Parrot of Lies. Acting: Deceive others so thoroughly that falsehood becomes tangible reality.",
+      "seq7": "Main: Cipher serpent venom & Secret code moss. Acting: Decipher hidden codes, exploit structural flaws in contracts and spells."
+    }
+  },
+  {
+    "name": "Visionary Pathway",
+    "group": "God Almighty",
+    "symbol": "All-Seeing Eye hovering above golden sea of consciousness",
+    "authority": "Mind infiltration, Psychological suggestion, Dragon transformation, Materializing envisioned worlds",
+    "sequences": {
+      "9": "Spectator",
+      "8": "Telepathist",
+      "7": "Psychiatrist",
+      "6": "Hypnotist",
+      "5": "Dreamwalker",
+      "4": "Manipulator",
+      "3": "Discerner",
+      "2": "Sojourner",
+      "1": "Author",
+      "0": "Visionary"
+    },
+    "potion_notes": {
+      "seq9": "Main: Mind dragon horn powder & Golden apple sap. Acting: Observe others as an audience member; notice subconscious cues without interfering.",
+      "seq8": "Main: Illusion deer antler & Spirit butterfly scales. Acting: Sense emotional ripples and unspoken intentions in collective thought.",
+      "seq7": "Main: Soul-calming herb & Dream spring dew. Acting: Heal psychic trauma and balance manic fluctuations in the mind."
+    }
+  },
+  {
+    "name": "Sun Pathway",
+    "group": "God Almighty",
+    "symbol": "Radiant solar orb casting away shadows and corruption",
+    "authority": "Purification, Holy light, Exorcism, Divine oaths, Solar storms, Dispelling undead",
+    "sequences": {
+      "9": "Bard",
+      "8": "Light Supplicant",
+      "7": "Solar High Priest",
+      "6": "Notary",
+      "5": "Priest of Light",
+      "4": "Unshadowed",
+      "3": "Justice Mentor",
+      "2": "Lightseeker",
+      "1": "White Angel",
+      "0": "The Sun"
+    },
+    "potion_notes": {
+      "seq9": "Main: Sun sunflower core & Dawn rooster crest. Acting: Praise the light, inspire courage in allies, dispel despondency.",
+      "seq8": "Main: Solar flare crystal & Sacred olive oil. Acting: Walk in absolute faith toward the solar ideals of purity.",
+      "seq7": "Main: Golden bird feather & Flame lily nectar. Acting: Lead holy ceremonies, burn corruption, and radiate radiant warmth."
+    }
+  },
+  {
+    "name": "Tyrant Pathway",
+    "group": "God Almighty",
+    "symbol": "Raging lightning trident engulfed in oceanic maelstroms",
+    "authority": "Thunderstorms, Oceanic command, Calamity, Roar of terror, Lightning manipulation",
+    "sequences": {
+      "9": "Sailor",
+      "8": "Folk of Rage",
+      "7": "Seafarer",
+      "6": "Wind-blessed",
+      "5": "Ocean Singer",
+      "4": "Cataclysmic Arbiter",
+      "3": "Sea King",
+      "2": "Calamity",
+      "1": "Thunder God",
+      "0": "Tyrant"
+    },
+    "potion_notes": {
+      "seq9": "Main: Electric eel marrow & Deep sea pearl. Acting: Conquer the turbulent sea, balance aboard tossing vessels, respect oceanic might.",
+      "seq8": "Main: Storm bear gallbladder & Red coral powder. Acting: Unleash righteous anger when provoked; let wrath terrify adversaries.",
+      "seq7": "Main: Siren scales & Tide crystal. Acting: Command maritime currents and read seasonal storm fronts."
+    }
+  },
+  {
+    "name": "White Tower Pathway",
+    "group": "God Almighty",
+    "symbol": "Ivory tower inscribed with omniscient hieroglyphs",
+    "authority": "Universal analysis, Spell imitation, Omniscience, Tactical deduction, Prophecy",
+    "sequences": {
+      "9": "Reader",
+      "8": "Student of Ratiocination",
+      "7": "Knowledge Keeper",
+      "6": "Polymath",
+      "5": "Mysticologist",
+      "4": "Prophet",
+      "3": "Cognizer",
+      "2": "Wisdom Angel",
+      "1": "Omniscient Eye",
+      "0": "White Tower"
+    },
+    "potion_notes": {
+      "seq9": "Main: Owl brain marrow & Memory vine extract. Acting: Absorb vast knowledge, analyze patterns, preserve academic curiosity.",
+      "seq8": "Main: Clockwork crystal & Logic fern petal. Acting: Deduce cause and consequence through rigorous logical analysis.",
+      "seq7": "Main: Ancient parchment ashes & Ink of wisdom. Acting: Safeguard taboo records and comprehend historical truths."
+    }
+  },
+  {
+    "name": "Hanged Man Pathway",
+    "group": "God Almighty",
+    "symbol": "Inverted silhouette bleeding into shadowy abyss",
+    "authority": "Flesh mutations, Soul grazing, Degenerate sacrifices, Shadow knights, Sin absorption",
+    "sequences": {
+      "9": "Secrets Supplicant",
+      "8": "Listener",
+      "7": "Shadow Ascetic",
+      "6": "Rose Bishop",
+      "5": "Shepherd",
+      "4": "Black Knight",
+      "3": "Silver Knight",
+      "2": "Profane Blasphemer",
+      "1": "Dark Angel",
+      "0": "The Hanged Man"
+    },
+    "potion_notes": {
+      "seq9": "Main: Shadow goat horn & Blood rose nectar. Acting: Endure inner torment, whisper devotion to hidden powers, offer penance.",
+      "seq8": "Main: Whispering bat ear & Echo fungus. Acting: Listen to the secret murmurs of deities without succumbing to madness.",
+      "seq7": "Main: Black thorn root & Dark night dew. Acting: Discipline physical flesh through ascetic sacrifice and self-denial."
+    }
+  },
+  {
+    "name": "Darkness Pathway",
+    "group": "Eternal Darkness",
+    "symbol": "Crescent moon shrouded in crimson velvet night",
+    "authority": "Concealment, Slumber, Nightmare weaving, Soul calming, Tranquility, Misfortune",
+    "sequences": {
+      "9": "Sleepless",
+      "8": "Midnight Poet",
+      "7": "Nightmare",
+      "6": "Soul Assurer",
+      "5": "Spirit Guide",
+      "4": "Nightwatcher",
+      "3": "Horror Bishop",
+      "2": "Servant of Concealment",
+      "1": "Knight of Misfortune",
+      "0": "Darkness"
+    },
+    "potion_notes": {
+      "seq9": "Main: Midnight bellflower & Slumber grass sap. Acting: Guard the peaceful slumber of mortals, embrace night vitality.",
+      "seq8": "Main: Moonlight orchid & Night sparrow tongue. Acting: Compose poetry that touches soul depths in quiet darkness.",
+      "seq7": "Main: Nightmare hound fang & Dream poppy seed. Acting: Enter sleeping minds, drag adversaries into nightmares."
+    }
+  },
+  {
+    "name": "Death Pathway",
+    "group": "Eternal Darkness",
+    "symbol": "Bleached skull crowned with white underworld lilies",
+    "authority": "Necromancy, Underworld ferry, Undead summoning, Cold decay, Netherworld domain",
+    "sequences": {
+      "9": "Corpse Collector",
+      "8": "Gravedigger",
+      "7": "Spirit Medium",
+      "6": "Baron of Corruption",
+      "5": "Gatekeeper",
+      "4": "Undying",
+      "3": "Ferryman",
+      "2": "Death Consul",
+      "1": "Pale Emperor",
+      "0": "Death"
+    },
+    "potion_notes": {
+      "seq9": "Main: Ghost fungus & Mortuary soil. Acting: Treat the dead with clinical respect; become accustomed to physical decay.",
+      "seq8": "Main: Bone lotus root & Yew tree resin. Acting: Prepare resting places for corpses and deter grave desecration.",
+      "seq7": "Main: Underworld butterfly wing & Spirit silver dust. Acting: Channel lingering souls and interpret spectral grievances."
+    }
+  },
+  {
+    "name": "Twilight Giant Pathway",
+    "group": "Eternal Darkness",
+    "symbol": "Titan's broadsword silhouetted against dying dusk",
+    "authority": "Giant physique, Dawn light, Twilight decay, Guardian shield, Pure physical prowess",
+    "sequences": {
+      "9": "Warrior",
+      "8": "Pugilist",
+      "7": "Weapon Master",
+      "6": "Dawn Paladin",
+      "5": "Guardian",
+      "4": "Demon Hunter",
+      "3": "Silver Knight",
+      "2": "Glory",
+      "1": "Hand of God",
+      "0": "Twilight Giant"
+    },
+    "potion_notes": {
+      "seq9": "Main: Iron-skinned boar tusk & Giant bear muscle. Acting: Train physical stamina, fight with honor, shield the weak.",
+      "seq8": "Main: Stone ape knuckle & Bull sinew. Acting: Master hand-to-hand combat and temper inner discipline.",
+      "seq7": "Main: Quenched steel lily & Weapon spirit ore. Acting: Master every cold weapon and comprehend martial perfection."
+    }
+  },
+  {
+    "name": "Red Priest Pathway",
+    "group": "Calamity of Destruction",
+    "symbol": "Burning war banner bathed in volcanic crimson flames",
+    "authority": "Conflagration, Provocation, War command, Military stratagems, Blazing destruction",
+    "sequences": {
+      "9": "Hunter",
+      "8": "Provoker",
+      "7": "Pyromaniac",
+      "6": "Conspirer",
+      "5": "Reaper",
+      "4": "Iron-blooded Knight",
+      "3": "War Bishop",
+      "2": "Weather Warlock",
+      "1": "Conqueror",
+      "0": "Red Priest"
+    },
+    "potion_notes": {
+      "seq9": "Main: Flame wolf claw & Fire grass seed. Acting: Hunt dangerous prey, track footprints, survive harsh wilderness.",
+      "seq8": "Main: Chattering monkey vocal cord & Viper venom. Acting: Provoke adversaries into losing composure while remaining cold.",
+      "seq7": "Main: Lava salamander heart & Sulfur crystal. Acting: Command raging infernos and revel in fiery destruction."
+    }
+  },
+  {
+    "name": "Demoness Pathway",
+    "group": "Calamity of Destruction",
+    "symbol": "Veiled mirror dripping with freezing frost and pestilence",
+    "authority": "Seduction, Frost, Pestilence, Thread of fate manipulation, Calamitous disaster",
+    "sequences": {
+      "9": "Assassin",
+      "8": "Instigator",
+      "7": "Witch",
+      "6": "Demoness of Pleasure",
+      "5": "Demoness of Affliction",
+      "4": "Demoness of Despair",
+      "3": "Demoness of Unaging",
+      "2": "Demoness of Catastrophe",
+      "1": "Demoness of Apocalypse",
+      "0": "Demoness"
+    },
+    "potion_notes": {
+      "seq9": "Main: Shadow cat eye & Poison dart frog skin. Acting: Strike from darkness, terminate designated targets swiftly.",
+      "seq8": "Main: Discord viper gland & Siren tear. Acting: Sow strife, provoke mutual suspicion between allies.",
+      "seq7": "Main: Frost spider silk & Black widow heart. Acting: Embrace feminine charm, weave invisible threads of death."
+    }
+  },
+  {
+    "name": "Hermit Pathway",
+    "group": "Demon of Knowledge",
+    "symbol": "Scroll of Constellations unfurling across starry abyss",
+    "authority": "Mystical scrolls, Fairy tale enactment, Celestial astrology, Knowledge infusion, Taboo secrets",
+    "sequences": {
+      "9": "Mystery Pryer",
+      "8": "Melee Scholar",
+      "7": "Astrologer",
+      "6": "Scrolls Professor",
+      "5": "Mysticologist",
+      "4": "Clairvoyant",
+      "3": "Clairaudient",
+      "2": "Sage",
+      "1": "Knowledge Emperor",
+      "0": "The Hermit"
+    },
+    "potion_notes": {
+      "seq9": "Main: Starlight owl feather & Secret moss. Acting: Pry into mystical phenomena; never fear the weight of cosmic truths.",
+      "seq8": "Main: Bronze mantis claw & Scholar stone. Acting: Blend physical defense with occult insight.",
+      "seq7": "Main: Star chart fern & Meteorite dust. Acting: Cast astrological divinations and interpret celestial tides."
+    }
+  },
+  {
+    "name": "Paragon Pathway",
+    "group": "Demon of Knowledge",
+    "symbol": "Interlocking gears surrounded by alchemical crucible flame",
+    "authority": "Alchemy, Mechanical engineering, Mystical item forging, Civilization advancement",
+    "sequences": {
+      "9": "Savant",
+      "8": "Archaeologist",
+      "7": "Appraiser",
+      "6": "Machinist",
+      "5": "Artisan",
+      "4": "Alchemist",
+      "3": "Arcane Scholar",
+      "2": "Knowledge Sage",
+      "1": "Illuminator",
+      "0": "Paragon"
+    },
+    "potion_notes": {
+      "seq9": "Main: Lodestone core & Quicksilver ore. Acting: Master scientific principles, invent practical machinery, expand knowledge.",
+      "seq8": "Main: Fossilized fern & Ancient bronze dust. Acting: Excavate historical relics and uncover buried civilization remnants.",
+      "seq7": "Main: Prism stone & Truth crystal. Acting: Appraise antique artifacts and deduce latent mystical properties."
+    }
+  },
+  {
+    "name": "Wheel of Fortune Pathway",
+    "group": "Key of Light",
+    "symbol": "Rotating silver wheel entwined by ouroboros serpent",
+    "authority": "Good fortune, Calamitous misfortune, Probability manipulation, Reincarnation, Destiny reboot",
+    "sequences": {
+      "9": "Monster",
+      "8": "Robot",
+      "7": "Lucky One",
+      "6": "Calamity Priest",
+      "5": "Winner",
+      "4": "Misfortune Mage",
+      "3": "Chaos Wanderer",
+      "2": "Sojourner",
+      "1": "Snake of Mercury",
+      "0": "Wheel of Fortune"
+    },
+    "potion_notes": {
+      "seq9": "Main: Silver snake tooth & Chaos crystal. Acting: Perceive spiritual hallucinations without letting madness consume perception.",
+      "seq8": "Main: Clockwork heart & Calculation moss. Acting: Suppress turbulent emotions; act with absolute mechanical precision.",
+      "seq7": "Main: Four-leaf golden clover & Lucky star dust. Acting: Trust instinct and let fate guide choices without anxiety."
+    }
+  },
+  {
+    "name": "Mother Pathway",
+    "group": "Goddess of Origin",
+    "symbol": "Golden ear of wheat wrapped around blooming life chalice",
+    "authority": "Fecundity, Plant manipulation, Biological healing, Abundant harvest, Life transmutation",
+    "sequences": {
+      "9": "Planter",
+      "8": "Doctor",
+      "7": "Harvest Priest",
+      "6": "Biologist",
+      "5": "Druid",
+      "4": "Classical Alchemist",
+      "3": "Silver Knight of Life",
+      "2": "Desolation Matron",
+      "1": "Nature Deity",
+      "0": "Mother"
+    },
+    "potion_notes": {
+      "seq9": "Main: Fertile soil essence & Golden seed. Acting: Till the land, nurture sprouting seeds, understand natural seasons.",
+      "seq8": "Main: Medicinal ginseng & White deer antler. Acting: Diagnose physical ailments, administer remedies, save lives.",
+      "seq7": "Main: Bountiful grape vine & Sun dew. Acting: Bless agricultural fields and preside over celebration of harvest."
+    }
+  },
+  {
+    "name": "Moon Pathway",
+    "group": "Goddess of Origin",
+    "symbol": "Crimson full moon dripping scarlet moonlight",
+    "authority": "Vampiric longevity, Blood manipulation, Darkness potions, Beast taming, Lunar magic",
+    "sequences": {
+      "9": "Apothecary",
+      "8": "Beast Tamer",
+      "7": "Vampire",
+      "6": "Potions Professor",
+      "5": "Scarlet Scholar",
+      "4": "Shaman King",
+      "3": "High Summoner",
+      "2": "Life Angel",
+      "1": "Beauty Goddess",
+      "0": "The Moon"
+    },
+    "potion_notes": {
+      "seq9": "Main: Mandrake root & Nightshade blossom. Acting: Brew concoctions, diagnose illnesses, sell therapeutic remedies.",
+      "seq8": "Main: Moon wolf claw & Wild boar tusk. Acting: Communicate with wild beasts, establish dominance, tame predators.",
+      "seq7": "Main: Sanguine bat wing & Crimson moon crystal. Acting: Embrace nocturnal existence, master speed, savor bloodline pride."
+    }
+  },
+  {
+    "name": "Black Emperor Pathway",
+    "group": "The Anarchy",
+    "symbol": "Iron crown above tangled scales of twisted imperial law",
+    "authority": "Distorting rules, Exploiting loopholes, Imperial dominance, Resurrection from order dissolution",
+    "sequences": {
+      "9": "Lawyer",
+      "8": "Barbarian",
+      "7": "Briber",
+      "6": "Baron of Corruption",
+      "5": "Mentor of Disorder",
+      "4": "Earl of The Fallen",
+      "3": "Frenzy Mage",
+      "2": "Duke of Entropy",
+      "1": "Prince of Abolition",
+      "0": "Black Emperor"
+    },
+    "potion_notes": {
+      "seq9": "Main: Quibble crow tongue & Slate of arguments. Acting: Exploit contradictions in legal text, win disputes through rhetoric.",
+      "seq8": "Main: Wild rhino horn & Savage bear blood. Acting: Shatter established etiquette through raw, overwhelming force.",
+      "seq7": "Main: Gold coin of greed & Honeyed venom. Acting: Offer irresistible incentives to bend loyalties and soften resistance."
+    }
+  },
+  {
+    "name": "Justiciar Pathway",
+    "group": "The Anarchy",
+    "symbol": "Rigid sword of justice pinning down balanced bronze scales",
+    "authority": "Establishing rules, Binding prohibitions, Enforcing judgment, Spatial imprisonment",
+    "sequences": {
+      "9": "Arbiter",
+      "8": "Sheriff",
+      "7": "Interrogator",
+      "6": "Judge",
+      "5": "Disciplinary Paladin",
+      "4": "Imperative Mage",
+      "3": "Chaos Hunter",
+      "2": "Balance Angel",
+      "1": "Hand of Order",
+      "0": "Justiciar"
+    },
+    "potion_notes": {
+      "seq9": "Main: Bronze scales dust & Truth hound tooth. Acting: Mediate conflicts with fairness, enforce basic order without bias.",
+      "seq8": "Main: Iron shackle fragment & Guard dog fang. Acting: Patrol designated territory, apprehend criminals, maintain public peace.",
+      "seq7": "Main: Truth serum orchid & Agony thorn. Acting: Extract confession from guilty souls through psychological pressure."
+    }
+  },
+  {
+    "name": "Abyss Pathway",
+    "group": "Father of Devils",
+    "symbol": "Demonic ram horns curling over bottomless sulfur chasm",
+    "authority": "Devilish corruption, Sulfuric flame, Desire incitement, Cold blooded slaughter",
+    "sequences": {
+      "9": "Criminal",
+      "8": "Coldblooded",
+      "7": "Serial Killer",
+      "6": "Devil",
+      "5": "Desire Apostle",
+      "4": "Demon",
+      "3": "Frenzy Duke",
+      "2": "Bloody Archduke",
+      "1": "Abyss King",
+      "0": "Abyss"
+    },
+    "potion_notes": {
+      "seq9": "Main: Night hound tooth & Poison toad venom. Acting: Violate social taboos, embrace predatory instincts with icy precision.",
+      "seq8": "Main: Ice serpent bone & Slain wolf heart. Acting: Purge empathy and hesitation; view others as mere instruments.",
+      "seq7": "Main: Ritual blade rust & Blood crystal. Acting: Conduct methodical killings aligned with occult astrological patterns."
+    }
+  },
+  {
+    "name": "Chained Pathway",
+    "group": "Father of Devils",
+    "symbol": "Heavy rusted chains wrapping around raging wraith shadow",
+    "authority": "Zombie resilience, Wraith possession, Puppet curse, Restraint of desires, Abomination",
+    "sequences": {
+      "9": "Prisoner",
+      "8": "Lunatic",
+      "7": "Werewolf",
+      "6": "Zombie",
+      "5": "Wraith",
+      "4": "Puppet",
+      "3": "Disciple of Silence",
+      "2": "Ancient Curse",
+      "1": "Abomination",
+      "0": "The Chained"
+    },
+    "potion_notes": {
+      "seq9": "Main: Iron chain link & Dead tree bark. Acting: Endure confinement, restrain raging impulses behind stoic stillness.",
+      "seq8": "Main: Frenzy grass root & Mad dog saliva. Acting: Let suppressed insanity erupt in controlled bursts of ferocity.",
+      "seq7": "Main: Full moon wolf fur & Silver fang. Acting: Transform under moonlight while struggling to preserve inner reason."
+    }
+  }
+]
