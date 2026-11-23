@@ -1,3 +1,4 @@
+import https from "node:https";
 import { Bot } from "grammy";
 import { hydrate } from "@grammyjs/hydrate";
 import { config } from "./config";
@@ -11,7 +12,17 @@ import { registerGovernanceCommands } from "./commands/governance";
 import { registerMysticalCommands } from "./commands/mystical";
 
 export function createBot(): Bot<MyContext> {
-  const bot = new Bot<MyContext>(config.botToken);
+  // Guarantee IPv4 sockets for all Telegram API calls on Render/Cloud environments
+  const httpsAgent = new https.Agent({ family: 4, keepAlive: true });
+
+  const bot = new Bot<MyContext>(config.botToken, {
+    client: {
+      canUseWebhookReply: () => false,
+      baseFetchConfig: {
+        agent: httpsAgent,
+      } as any,
+    },
+  });
 
   // 1. Hydrate plugin for convenient message methods
   bot.use(hydrate());

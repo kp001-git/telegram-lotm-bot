@@ -1,11 +1,18 @@
+import dns from "node:dns";
+dns.setDefaultResultOrder("ipv4first");
+
 import http from "node:http";
-import { createBot } from "./bot";
+import { Bot } from "grammy";
+import { createBot, setupBotCommands } from "./bot";
 import { initSchema } from "./database/schema";
 import { config, setDynamicOwnerId } from "./config";
 import { systemRepository } from "./database/repositories/system.repository";
 import { userRepository } from "./database/repositories/user.repository";
+import { MyContext } from "./middlewares/context";
 
-export function createHealthServer(port: number = config.port): http.Server {
+export function createHealthServer(
+  port: number = Number(process.env.PORT) || config.port
+): http.Server {
   const server = http.createServer((req, res) => {
     const url = req.url || "/";
     if (url === "/" || url === "/health") {
@@ -25,11 +32,49 @@ export function createHealthServer(port: number = config.port): http.Server {
     }
   });
 
-  server.listen(port, () => {
-    console.log(`[Health Server] Resonating on port ${port} (/health)`);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`[Health Server] Resonating on 0.0.0.0:${port} (/health)`);
   });
 
   return server;
+}
+
+async function startBotWithRetry(
+  bot: Bot<MyContext>,
+  isShuttingDown: () => boolean
+): Promise<void> {
+  while (!isShuttingDown()) {
+    try {
+      console.log("[Telegram] Inquiring connection with the Grey Fog (getMe)...");
+      const me = await bot.api.getMe();
+      console.log(`\n======================================================`);
+      console.log(`𓆩 @${me.username} is ONLINE above the Grey Fog 𓆪`);
+      console.log(`Bot ID: ${me.id} | Name: ${me.first_name}`);
+      console.log(`Ready to oversee the Tarot Club sanctuary.`);
+      console.log(`======================================================\n`);
+
+      // Sync Telegram command menu
+      await setupBotCommands(bot);
+
+      // Start Polling with drop_pending_updates: true
+      console.log("[Polling] Actively receiving spiritual whispers (updates)...");
+      await bot.start({
+        drop_pending_updates: true,
+        onStart: () => {
+          console.log("[Polling] Connection confirmed. The sanctuary is active.");
+        },
+      });
+
+      // If bot.start completed without throwing (e.g. stopped gracefully), break loop
+      break;
+    } catch (err: any) {
+      if (isShuttingDown()) break;
+      console.error(
+        `[Telegram Error] Connection attempt failed: ${err?.message || err}. Retrying in 5 seconds...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  }
 }
 
 async function bootstrap() {
@@ -56,42 +101,31 @@ async function bootstrap() {
     }
   }
 
-  // 3. Start native HTTP health server for Render / Alwaysdata 24/7 uptime
-  const healthServer = createHealthServer(config.port);
+  // 3. Bind HTTP health server on 0.0.0.0 FIRST so Render detects port immediately
+  const healthPort = Number(process.env.PORT) || config.port;
+  const healthServer = createHealthServer(healthPort);
 
   // 4. Assemble Bot
   const bot = createBot();
 
   // 5. Graceful Shutdown
+  let shuttingDown = false;
   const stopBot = async (signal: string) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
     console.log(`\n𓆩 Receiving ${signal}. The Grey Fog recedes into slumber... 𓆪`);
     healthServer.close();
-    await bot.stop();
+    try {
+      await bot.stop();
+    } catch {}
     process.exit(0);
   };
 
   process.once("SIGINT", () => stopBot("SIGINT"));
   process.once("SIGTERM", () => stopBot("SIGTERM"));
 
-  // 6. Fetch bot info to confirm token and connection
-  const me = await bot.api.getMe();
-  console.log(`\n======================================================`);
-  console.log(`𓆩 @${me.username} is ONLINE above the Grey Fog 𓆪`);
-  console.log(`Bot ID: ${me.id} | Name: ${me.first_name}`);
-  console.log(`Ready to oversee the Tarot Club sanctuary.`);
-  console.log(`======================================================\n`);
-
-  // 7. Sync Telegram command menu
-  const { setupBotCommands } = await import("./bot");
-  await setupBotCommands(bot);
-
-  // 8. Start Polling with drop_pending_updates: true
-  await bot.start({
-    drop_pending_updates: true,
-    onStart: () => {
-      console.log("[Polling] Actively receiving spiritual whispers (updates)...");
-    },
-  });
+  // 6. Connect to Telegram with automatic retry on network errors
+  await startBotWithRetry(bot, () => shuttingDown);
 }
 
 // Start if executed directly
