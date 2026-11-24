@@ -12,21 +12,61 @@ interface CacheEntry {
 const TTL_MS = 5 * 60 * 1000; // 5 minutes TTL
 
 class UserCache {
-  private cache = new Map<number, CacheEntry>();
+  private cache = new Map<string, CacheEntry>();
 
-  get(userId: number): CacheEntry | undefined {
-    const entry = this.cache.get(userId);
+  private makeKey(chatId: number | undefined | null, userId: number): string {
+    return `${chatId ?? "global"}:${userId}`;
+  }
+
+  get(chatIdOrUserId: number | undefined | null, maybeUserId?: number): CacheEntry | undefined {
+    let key: string;
+    if (maybeUserId !== undefined) {
+      key = this.makeKey(chatIdOrUserId, maybeUserId);
+    } else {
+      key = this.makeKey(undefined, chatIdOrUserId as number);
+    }
+
+    const entry = this.cache.get(key);
     if (!entry) return undefined;
     if (Date.now() > entry.expiresAt) {
-      this.cache.delete(userId);
+      this.cache.delete(key);
       return undefined;
     }
     return entry;
   }
 
-  set(userId: number, role: BeyonderRole, user: DbUser | null, firstName: string, username: string | null): void {
-    const existing = this.cache.get(userId);
-    this.cache.set(userId, {
+  set(
+    chatIdOrUserId: number | undefined | null,
+    userIdOrRole: number | BeyonderRole,
+    roleOrUser?: BeyonderRole | DbUser | null,
+    userOrFirstName?: DbUser | null | string,
+    firstNameOrUsername?: string | string | null,
+    maybeUsername?: string | null
+  ): void {
+    let key: string;
+    let role: BeyonderRole;
+    let user: DbUser | null;
+    let firstName: string;
+    let username: string | null;
+
+    if (typeof userIdOrRole === "number") {
+      // Called with (chatId, userId, role, user, firstName, username)
+      key = this.makeKey(chatIdOrUserId, userIdOrRole);
+      role = roleOrUser as BeyonderRole;
+      user = (userOrFirstName as DbUser | null) || null;
+      firstName = (firstNameOrUsername as string) || "";
+      username = maybeUsername ?? null;
+    } else {
+      // Legacy signature: (userId, role, user, firstName, username)
+      key = this.makeKey(undefined, chatIdOrUserId as number);
+      role = userIdOrRole as BeyonderRole;
+      user = (roleOrUser as DbUser | null) || null;
+      firstName = (userOrFirstName as string) || "";
+      username = (firstNameOrUsername as string) ?? null;
+    }
+
+    const existing = this.cache.get(key);
+    this.cache.set(key, {
       user,
       role,
       lastSeenName: firstName,
@@ -36,8 +76,8 @@ class UserCache {
     });
   }
 
-  incrementMessages(userId: number): number {
-    const entry = this.get(userId);
+  incrementMessages(chatIdOrUserId: number | undefined | null, maybeUserId?: number): number {
+    const entry = this.get(chatIdOrUserId, maybeUserId);
     if (entry) {
       entry.unsavedMessages += 1;
       return entry.unsavedMessages;
@@ -45,15 +85,31 @@ class UserCache {
     return 1;
   }
 
-  resetUnsavedMessages(userId: number): void {
-    const entry = this.get(userId);
+  resetUnsavedMessages(chatIdOrUserId: number | undefined | null, maybeUserId?: number): void {
+    const entry = this.get(chatIdOrUserId, maybeUserId);
     if (entry) {
       entry.unsavedMessages = 0;
     }
   }
 
-  invalidate(userId: number): void {
-    this.cache.delete(userId);
+  invalidate(chatIdOrUserId: number | undefined | null, maybeUserId?: number): void {
+    if (maybeUserId !== undefined) {
+      this.cache.delete(this.makeKey(chatIdOrUserId, maybeUserId));
+      // Also delete global fallback key
+      this.cache.delete(this.makeKey(undefined, maybeUserId));
+    } else if (chatIdOrUserId !== undefined && chatIdOrUserId !== null) {
+      // Invalidate both direct key and any scoped keys for this userId
+      this.cache.delete(this.makeKey(undefined, chatIdOrUserId));
+      for (const key of this.cache.keys()) {
+        if (key.endsWith(`:${chatIdOrUserId}`)) {
+          this.cache.delete(key);
+        }
+      }
+    }
+  }
+
+  clear(): void {
+    this.cache.clear();
   }
 }
 

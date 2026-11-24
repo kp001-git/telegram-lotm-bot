@@ -63,7 +63,7 @@ export function registerMysticalCommands(bot: Bot<MyContext>): void {
 
     // Add participant & increment devotion in Turso
     session.participants.set(from.id, from.first_name);
-    await userRepository.incrementPrayers(from.id);
+    await userRepository.incrementPrayers(from.id, ctx.chat?.id);
 
     const count = session.participants.size;
     const isCompleted = count >= session.maxParticipants;

@@ -6,6 +6,7 @@ export type PollStatus = "OPEN" | "CLOSED";
 
 export interface Submission {
   id: number;
+  chat_id: number | null;
   user_id: number;
   type: SubmissionType;
   content: string;
@@ -50,16 +51,17 @@ export class GovernanceRepository {
   async createSubmission(
     userId: number,
     type: SubmissionType,
-    content: string
+    content: string,
+    chatId?: number | null
   ): Promise<number> {
     const now = new Date().toISOString();
     const result = await this.client.execute({
       sql: `
-        INSERT INTO suggestions (user_id, type, content, status, reviewed_by, created_at)
-        VALUES (?, ?, ?, 'PENDING', NULL, ?)
+        INSERT INTO suggestions (chat_id, user_id, type, content, status, reviewed_by, created_at)
+        VALUES (?, ?, ?, ?, 'PENDING', NULL, ?)
         RETURNING id;
       `,
-      args: [userId, type, content, now],
+      args: [chatId ?? null, userId, type, content, now],
     });
 
     return Number(result.rows[0].id);
@@ -90,11 +92,50 @@ export class GovernanceRepository {
     });
   }
 
-  async getApprovedSuggestions(limit = 15): Promise<ApprovedSubmission[]> {
+  async getApprovedSuggestions(
+    chatIdOrLimit?: number,
+    maybeLimit?: number
+  ): Promise<ApprovedSubmission[]> {
+    let chatId: number | undefined;
+    let limit = 15;
+
+    if (maybeLimit !== undefined) {
+      chatId = chatIdOrLimit;
+      limit = maybeLimit;
+    } else if (typeof chatIdOrLimit === "number") {
+      if (chatIdOrLimit < 0 || chatIdOrLimit > 1000) {
+        // Likely a chat_id (negative Telegram group ID or positive channel ID)
+        chatId = chatIdOrLimit;
+      } else {
+        limit = chatIdOrLimit;
+      }
+    }
+
+    if (chatId !== undefined) {
+      const result = await this.client.execute({
+        sql: `
+          SELECT s.*, 
+            COALESCE(gm.first_name, u.first_name) as author_first_name, 
+            COALESCE(gm.username, u.username) as author_username
+          FROM suggestions s
+          LEFT JOIN group_members gm ON s.user_id = gm.user_id AND s.chat_id = gm.chat_id
+          LEFT JOIN users u ON s.user_id = u.user_id
+          WHERE s.status = 'APPROVED' AND s.chat_id = ?
+          ORDER BY s.id DESC
+          LIMIT ?;
+        `,
+        args: [chatId, limit],
+      });
+      return result.rows as unknown as ApprovedSubmission[];
+    }
+
     const result = await this.client.execute({
       sql: `
-        SELECT s.*, u.first_name as author_first_name, u.username as author_username
+        SELECT s.*, 
+          COALESCE(gm.first_name, u.first_name) as author_first_name, 
+          COALESCE(gm.username, u.username) as author_username
         FROM suggestions s
+        LEFT JOIN group_members gm ON s.user_id = gm.user_id AND s.chat_id = gm.chat_id
         LEFT JOIN users u ON s.user_id = u.user_id
         WHERE s.status = 'APPROVED'
         ORDER BY s.id DESC

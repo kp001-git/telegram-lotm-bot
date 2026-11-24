@@ -3,7 +3,7 @@ import { userRepository, DbUser } from "../../database/repositories/user.reposit
 import { formatHeader, formatDivider, formatUserMention } from "../../utils/formatters";
 
 export async function councilCommand(ctx: MyContext): Promise<void> {
-  const councilMembers = await userRepository.getCouncilMembers();
+  const councilMembers = await userRepository.getCouncilMembers(ctx.chat?.id);
 
   // Group members by role
   const groups: Record<string, DbUser[]> = {

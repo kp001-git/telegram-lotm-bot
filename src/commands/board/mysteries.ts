@@ -15,7 +15,7 @@ export async function mysteriesCommand(ctx: MyContext): Promise<void> {
   }
 
   const isSealed = await groupRepository.isChatSealed(chat.id);
-  const councilMembers = await userRepository.getCouncilMembers();
+  const councilMembers = await userRepository.getCouncilMembers(chat.id);
 
   const title = chat.title || "The Divine Hall";
   const sealBadge = isSealed

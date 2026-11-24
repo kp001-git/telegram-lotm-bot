@@ -3,7 +3,7 @@ import { MyContext } from "./context";
 import { sanctuaryRepository } from "../database/repositories/sanctuary.repository";
 
 export const UNAUTHORIZED_GROUP_MESSAGE =
-  `This group is not whitelisted to use @greyfogbot.\n\nIf you want to add this bot to your group, please contact <a href="https://t.me/ashenliving">Soul</a> for permission.`;
+  `This group is not whitelisted to use @greyfogbot.\n\nIf you want to add this bot to your group, please contact <a href="https://t.me/ashenliving">Soul</a> or <a href="tg://user?id=7134739492">The Celestial Worthy</a> for permission.`;
 
 export async function groupOnlyGuard(ctx: MyContext, next: NextFunction): Promise<void> {
   const chat = ctx.chat;
@@ -19,7 +19,10 @@ export async function groupOnlyGuard(ctx: MyContext, next: NextFunction): Promis
   const isAuthorized = await sanctuaryRepository.isChatAuthorized(chat.id);
   if (!isAuthorized) {
     try {
-      await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, { parse_mode: "HTML" });
+      await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, {
+        parse_mode: "HTML",
+        link_preview_options: { is_disabled: true },
+      });
     } catch (err) {
       console.warn(`[gatekeeper] Failed to send exit message to ${chat.id}:`, err);
     }

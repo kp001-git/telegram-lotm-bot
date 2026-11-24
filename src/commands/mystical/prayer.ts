@@ -22,7 +22,7 @@ export async function prayerCommand(ctx: MyContext): Promise<void> {
   const petition = parts.slice(1).join(" ").trim();
 
   // Increment prayers count in Turso
-  const totalPrayers = await userRepository.incrementPrayers(from.id);
+  const totalPrayers = await userRepository.incrementPrayers(from.id, ctx.chat?.id);
 
   const petitionBlock = petition
     ? `\n<b>Petitioner's Whisper:</b>\n<i>"${escapeHtml(petition)}"</i>\n`

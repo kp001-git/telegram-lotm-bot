@@ -12,18 +12,27 @@ import { renderWelcomeTemplate } from "../src/commands/board/summoning";
 import { cooldownManager } from "../src/utils/cooldown";
 import { sanctuaryRepository } from "../src/database/repositories/sanctuary.repository";
 import { createHealthServer } from "../src/index";
+import { UNAUTHORIZED_GROUP_MESSAGE } from "../src/middlewares/guard";
 import pathwaysData from "../src/data/pathways.json";
 import tarotData from "../src/data/tarot_cards.json";
 import mysticalEvents from "../src/data/mystical_events.json";
 
 async function runTests() {
-  console.log("=== Running Comprehensive Verification Tests (Phases 1, 2, 3, 4 & 5) ===");
+  console.log("=== Running Comprehensive Verification Tests (Phases 1, 2, 3, 4, 5 & Phase A) ===");
   
   // 1. Schema Init & Clean State
   await initSchema();
   const client = getDatabaseClient();
   await client.execute({
-    sql: `DELETE FROM users WHERE user_id IN (7770001, 7770002, 7770003);`,
+    sql: `DELETE FROM users WHERE user_id IN (7770001, 7770002, 7770003, 8880001, 8880002);`,
+    args: [],
+  });
+  await client.execute({
+    sql: `DELETE FROM group_members WHERE chat_id IN (-100111111, -100222222, -1009876543);`,
+    args: [],
+  });
+  await client.execute({
+    sql: `DELETE FROM suggestions WHERE chat_id IN (-100111111, -100222222);`,
     args: [],
   });
   await client.execute({
@@ -177,8 +186,9 @@ async function runTests() {
   console.log("✔ Welcome template persistence and placeholder rendering verified.");
 
   // 13. Phase 3: getFateRecords Aggregation Query
-  await userRepository.upsertUser(7770002, "alger_wilson", "Alger", "THE_WORLD", 45);
-  await userRepository.upsertUser(7770003, "derrick_berg", "Derrick", "BEYONDER", 80);
+  await userRepository.upsertMember(testChatId, testUserId, "klein_moretti", "Klein", "THE_FOOL", 1);
+  await userRepository.upsertMember(testChatId, 7770002, "alger_wilson", "Alger", "THE_WORLD", 45);
+  await userRepository.upsertMember(testChatId, 7770003, "derrick_berg", "Derrick", "BEYONDER", 80);
   
   const fateRecords = await userRepository.getFateRecords(testChatId);
   if (
@@ -379,7 +389,100 @@ async function runTests() {
   }
   console.log("✔ Group Whitelist Gatekeeper (isChatAuthorized) verified.");
 
-  console.log("\n𓆩 All Phase 1, 2, 3, 4 & 5 Verification Tests Passed Flawlessly! 𓆪\n");
+  // 23. True Per-Group Memory & Data Isolation (chat_id scoping)
+  const groupAId = -100111111;
+  const groupBId = -100222222;
+  const userAId = 8880001;
+  const userBId = 8880002;
+
+  // Group A: Leonard (THE_STAR, 15 messages)
+  await userRepository.upsertMember(groupAId, userAId, "leonard_mitchell", "Leonard", "THE_STAR", 15);
+  await userRepository.incrementPrayers(userAId, groupAId); // prayers: 1
+  await userRepository.incrementPrayers(userAId, groupAId); // prayers: 2
+
+  // Group B: Alger (THE_WORLD, 25 messages)
+  await userRepository.upsertMember(groupBId, userBId, "alger_wilson", "Alger", "THE_WORLD", 25);
+  await userRepository.incrementPrayers(userBId, groupBId); // prayers: 1
+
+  // Verify Council Isolation: Group A only has Leonard, Group B only has Alger
+  const councilA = await userRepository.getCouncilMembers(groupAId);
+  const councilB = await userRepository.getCouncilMembers(groupBId);
+
+  if (councilA.length !== 1 || councilA[0].user_id !== userAId || councilA[0].role !== "THE_STAR") {
+    throw new Error(`Group A council isolation failed: ${JSON.stringify(councilA)}`);
+  }
+  if (councilB.length !== 1 || councilB[0].user_id !== userBId || councilB[0].role !== "THE_WORLD") {
+    throw new Error(`Group B council isolation failed: ${JSON.stringify(councilB)}`);
+  }
+
+  // Verify Stats Isolation (/fate_records)
+  const recordsA = await userRepository.getFateRecords(groupAId);
+  const recordsB = await userRepository.getFateRecords(groupBId);
+
+  if (recordsA.totalBeyonders !== 1 || recordsA.totalMessages !== 15 || recordsA.totalPrayers !== 2) {
+    throw new Error(`Group A stats isolation failed: ${JSON.stringify(recordsA)}`);
+  }
+  if (recordsB.totalBeyonders !== 1 || recordsB.totalMessages !== 25 || recordsB.totalPrayers !== 1) {
+    throw new Error(`Group B stats isolation failed: ${JSON.stringify(recordsB)}`);
+  }
+
+  // Verify Suggestions Scoping: Group A suggestions do not appear in Group B
+  const subAId = await governanceRepository.createSubmission(userAId, "SUGGESTION", "Group A sacred law", groupAId);
+  const subBId = await governanceRepository.createSubmission(userBId, "IDEA", "Group B naval expansion", groupBId);
+  await governanceRepository.updateSubmissionStatus(subAId, "APPROVED");
+  await governanceRepository.updateSubmissionStatus(subBId, "APPROVED");
+
+  const approvedA = await governanceRepository.getApprovedSuggestions(groupAId);
+  const approvedB = await governanceRepository.getApprovedSuggestions(groupBId);
+
+  if (!approvedA.find((s) => s.id === subAId) || approvedA.find((s) => s.id === subBId)) {
+    throw new Error(`Group A suggestions scoping failed: ${JSON.stringify(approvedA)}`);
+  }
+  if (!approvedB.find((s) => s.id === subBId) || approvedB.find((s) => s.id === subAId)) {
+    throw new Error(`Group B suggestions scoping failed: ${JSON.stringify(approvedB)}`);
+  }
+  console.log("✔ True multi-group isolation (members, council, stats, suggestions) verified.");
+
+  // 24. /ascend and /degrade State Transitions & Cache Invalidation per chat_id
+  userCache.invalidate(groupAId, userAId);
+  await userRepository.setMemberRole(groupAId, userAId, "THE_FOOL");
+  userCache.invalidate(groupAId, userAId);
+
+  const ascendedMember = await userRepository.getMember(groupAId, userAId);
+  if (!ascendedMember || ascendedMember.role !== "THE_FOOL") {
+    throw new Error(`Ascend role state transition failed: ${JSON.stringify(ascendedMember)}`);
+  }
+
+  await userRepository.setMemberRole(groupAId, userAId, "BEYONDER");
+  userCache.invalidate(groupAId, userAId);
+
+  const degradedMember = await userRepository.getMember(groupAId, userAId);
+  if (!degradedMember || degradedMember.role !== "BEYONDER") {
+    throw new Error(`Degrade role state transition failed: ${JSON.stringify(degradedMember)}`);
+  }
+
+  const councilAfterDegrade = await userRepository.getCouncilMembers(groupAId);
+  if (councilAfterDegrade.length !== 0) {
+    throw new Error(`Council after degrade should be empty, got ${councilAfterDegrade.length}`);
+  }
+  console.log("✔ /ascend and /degrade state transitions and cache invalidation per chat_id verified.");
+
+  // 25. Unauthorized Whitelist Exit Notice Verification
+  if (!UNAUTHORIZED_GROUP_MESSAGE.includes("https://t.me/ashenliving") || !UNAUTHORIZED_GROUP_MESSAGE.includes("Soul")) {
+    throw new Error("Exit message must link Soul to https://t.me/ashenliving");
+  }
+  if (!UNAUTHORIZED_GROUP_MESSAGE.includes("tg://user?id=7134739492") || !UNAUTHORIZED_GROUP_MESSAGE.includes("The Celestial Worthy")) {
+    throw new Error("Exit message must link The Celestial Worthy to tg://user?id=7134739492");
+  }
+
+  const soulIndex = UNAUTHORIZED_GROUP_MESSAGE.indexOf("https://t.me/ashenliving");
+  const cwIndex = UNAUTHORIZED_GROUP_MESSAGE.indexOf("tg://user?id=7134739492");
+  if (soulIndex === -1 || cwIndex === -1 || soulIndex > cwIndex) {
+    throw new Error("Soul must be positioned first and The Celestial Worthy second in the exit message");
+  }
+  console.log("✔ Unauthorized whitelist exit notice formatting (Soul first, CW second) verified.");
+
+  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5 & Phase A Verification Tests Passed Flawlessly! 𓆪\n");
 }
 
 runTests().catch((err) => {

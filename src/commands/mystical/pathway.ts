@@ -49,8 +49,8 @@ export async function pathwayCommand(ctx: MyContext): Promise<void> {
       return;
     }
 
-    await userRepository.setUserPathway(from.id, pathway.name);
-    userCache.invalidate(from.id);
+    await userRepository.setUserPathway(from.id, pathway.name, ctx.chat?.id);
+    userCache.invalidate(ctx.chat?.id, from.id);
 
     const seq9Name = pathway.sequences["9"] || "Initiate";
 

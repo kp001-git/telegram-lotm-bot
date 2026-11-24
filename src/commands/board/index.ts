@@ -52,7 +52,8 @@ export function registerBoardCommands(bot: Bot<MyContext>): void {
 
       // Upsert new Beyonder into Turso
       try {
-        await userRepository.upsertUser(
+        await userRepository.upsertMember(
+          chat.id,
           member.id,
           member.username || null,
           member.first_name,

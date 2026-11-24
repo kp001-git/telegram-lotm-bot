@@ -36,7 +36,10 @@ export function createBot(): Bot<MyContext> {
       const isAuthorized = await sanctuaryRepository.isChatAuthorized(chat.id);
       if (!isAuthorized) {
         try {
-          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, { parse_mode: "HTML" });
+          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, {
+            parse_mode: "HTML",
+            link_preview_options: { is_disabled: true },
+          });
         } catch (err) {
           console.warn(`[gatekeeper] Failed to send exit message to ${chat.id}:`, err);
         }
@@ -61,7 +64,10 @@ export function createBot(): Bot<MyContext> {
       const isAuthorized = await sanctuaryRepository.isChatAuthorized(chat.id);
       if (!isAuthorized) {
         try {
-          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, { parse_mode: "HTML" });
+          await ctx.reply(UNAUTHORIZED_GROUP_MESSAGE, {
+            parse_mode: "HTML",
+            link_preview_options: { is_disabled: true },
+          });
         } catch (err) {
           console.warn(`[gatekeeper] Failed to send exit message to ${chat.id}:`, err);
         }

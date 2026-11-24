@@ -29,7 +29,7 @@ export async function handleSubmission(
   }
 
   // 1. Create submission in Turso
-  const submissionId = await governanceRepository.createSubmission(from.id, type, content);
+  const submissionId = await governanceRepository.createSubmission(from.id, type, content, ctx.chat?.id);
 
   const typeLabel =
     type === "SUGGESTION"

@@ -32,21 +32,23 @@ export async function degradeCommand(ctx: MyContext): Promise<void> {
   }
 
   // 1. Demote to BEYONDER in Turso
-  await userRepository.setRole(target.userId, "BEYONDER");
-  userCache.invalidate(target.userId);
+  await userRepository.setMemberRole(chat.id, target.userId, "BEYONDER");
+  userCache.invalidate(chat.id, target.userId);
 
   // 2. Revoke Telegram admin privileges
   try {
-    await ctx.promoteChatMember(target.userId, {
+    await ctx.api.promoteChatMember(chat.id, target.userId, {
       can_manage_chat: false,
       can_delete_messages: false,
       can_restrict_members: false,
       can_pin_messages: false,
       can_invite_users: false,
+      can_manage_video_chats: false,
+      can_promote_members: false,
       can_change_info: false,
     });
   } catch (err: any) {
-    console.warn(`[degrade] Telegram promoteChatMember revoke for ${target.userId}:`, err?.message);
+    console.warn(`[degrade] Telegram promoteChatMember revoke for ${target.userId}:`, err?.description || err?.message);
   }
 
   // 3. Log audit

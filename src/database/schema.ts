@@ -15,6 +15,20 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       joined_at TEXT,
       updated_at TEXT
     );`,
+    `CREATE TABLE IF NOT EXISTS group_members (
+      chat_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      username TEXT,
+      first_name TEXT,
+      role TEXT DEFAULT 'BEYONDER',
+      pathway TEXT,
+      sequence_level INTEGER DEFAULT 9,
+      prayers_count INTEGER DEFAULT 0,
+      messages_count INTEGER DEFAULT 0,
+      joined_at TEXT,
+      updated_at TEXT,
+      PRIMARY KEY (chat_id, user_id)
+    );`,
     `CREATE TABLE IF NOT EXISTS group_settings (
       chat_id INTEGER PRIMARY KEY,
       sacred_laws TEXT,
@@ -34,6 +48,7 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
     );`,
     `CREATE TABLE IF NOT EXISTS suggestions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      chat_id INTEGER,
       user_id INTEGER,
       type TEXT,
       content TEXT,
@@ -70,10 +85,26 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       updated_at TEXT
     );`,
     `CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);`,
+    `CREATE INDEX IF NOT EXISTS idx_group_members_role ON group_members(chat_id, role);`,
+    `CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id);`,
     `CREATE INDEX IF NOT EXISTS idx_audit_logs_chat ON audit_logs(chat_id);`,
     `CREATE INDEX IF NOT EXISTS idx_polls_chat_status ON polls(chat_id, status);`,
     `CREATE INDEX IF NOT EXISTS idx_poll_votes_poll ON poll_votes(poll_id);`
   ];
 
   await client.batch(statements, "write");
+
+  // Safe migration for existing installations where suggestions table lacked chat_id
+  try {
+    await client.execute("ALTER TABLE suggestions ADD COLUMN chat_id INTEGER;");
+  } catch {
+    // Column already present or table created fresh with column
+  }
+
+  // Create index on suggestions(chat_id) after column is guaranteed to exist
+  try {
+    await client.execute("CREATE INDEX IF NOT EXISTS idx_suggestions_chat ON suggestions(chat_id);");
+  } catch {
+    // Ignore index creation error
+  }
 }

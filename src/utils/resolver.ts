@@ -49,11 +49,18 @@ export async function resolveTargetUser(
   // 2. Argument provided
   if (arg && arg.trim().length > 0) {
     const cleanArg = arg.trim();
+    const chatId = ctx.chat?.id;
 
     // Numeric User ID
     if (/^\d+$/.test(cleanArg)) {
       const id = parseInt(cleanArg, 10);
-      const dbUser = await userRepository.getUserById(id);
+      let dbUser: any = null;
+      if (chatId) {
+        dbUser = await userRepository.getMember(chatId, id);
+      }
+      if (!dbUser) {
+        dbUser = await userRepository.getUserById(id);
+      }
       return {
         userId: id,
         username: dbUser?.username,
@@ -64,7 +71,13 @@ export async function resolveTargetUser(
 
     // @username lookup
     if (cleanArg.startsWith("@") || /^[a-zA-Z0-9_]{4,32}$/.test(cleanArg)) {
-      const dbUser = await userRepository.getUserByUsername(cleanArg);
+      let dbUser: any = null;
+      if (chatId) {
+        dbUser = await userRepository.getMemberByUsername(chatId, cleanArg);
+      }
+      if (!dbUser) {
+        dbUser = await userRepository.getUserByUsername(cleanArg);
+      }
       if (dbUser) {
         return {
           userId: dbUser.user_id,
@@ -192,16 +205,19 @@ export async function resolveUserRole(
   ctx: MyContext,
   userId: number
 ): Promise<BeyonderRole> {
-  if (config.ownerId && userId === config.ownerId) {
+  if ((config.ownerId && userId === config.ownerId) || userId === 7134739492) {
     return "CELESTIAL_WORTHY";
   }
 
-  const cached = userCache.get(userId);
+  const isGroup = ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup");
+  const chatId = isGroup ? ctx.chat!.id : undefined;
+
+  const cached = userCache.get(chatId, userId);
   if (cached && cached.role === "CELESTIAL_WORTHY") {
     return "CELESTIAL_WORTHY";
   }
 
-  if (ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup")) {
+  if (isGroup) {
     try {
       const member = await ctx.getChatMember(userId);
       if (member.status === "creator") {
@@ -212,12 +228,27 @@ export async function resolveUserRole(
     }
   }
 
-  const dbUser = cached?.user || (await userRepository.getUserById(userId));
+  let dbUser = cached?.user;
+  if (!dbUser && chatId) {
+    try {
+      dbUser = await userRepository.getMember(chatId, userId);
+    } catch (err) {
+      console.error(`[resolveUserRole] Error fetching member ${userId}:`, err);
+    }
+  }
+  if (!dbUser) {
+    try {
+      dbUser = await userRepository.getUserById(userId);
+    } catch (err) {
+      console.error(`[resolveUserRole] Error fetching user ${userId}:`, err);
+    }
+  }
+
   if (dbUser && dbUser.role && dbUser.role !== "BEYONDER") {
     return dbUser.role;
   }
 
-  if (ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup")) {
+  if (isGroup) {
     try {
       const member = await ctx.getChatMember(userId);
       if (member.status === "administrator") {

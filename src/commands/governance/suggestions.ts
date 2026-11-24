@@ -3,7 +3,7 @@ import { governanceRepository } from "../../database/repositories/governance.rep
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
 export async function suggestionsCommand(ctx: MyContext): Promise<void> {
-  const approved = await governanceRepository.getApprovedSuggestions(15);
+  const approved = await governanceRepository.getApprovedSuggestions(ctx.chat?.id, 15);
 
   if (approved.length === 0) {
     await ctx.reply(

@@ -17,17 +17,27 @@ export async function userSyncMiddleware(ctx: MyContext, next: NextFunction): Pr
   const userId = from.id;
   const username = from.username || null;
   const firstName = from.first_name;
+  const isGroup = ctx.chat && (ctx.chat.type === "group" || ctx.chat.type === "supergroup");
+  const chatId = isGroup ? ctx.chat!.id : undefined;
 
-  const cached = userCache.get(userId);
+  const cached = userCache.get(chatId, userId);
 
   if (!cached) {
     // Cache miss: sync to Turso once and cache
     try {
-      await userRepository.upsertUser(userId, username, firstName, "BEYONDER");
-      const dbUser = await userRepository.getUserById(userId);
-      const role = dbUser?.role || "BEYONDER";
-      userCache.set(userId, role, dbUser, firstName, username);
-      ctx.dbUser = dbUser;
+      if (chatId) {
+        await userRepository.upsertMember(chatId, userId, username, firstName, "BEYONDER");
+        const dbMember = await userRepository.getMember(chatId, userId);
+        const role = dbMember?.role || "BEYONDER";
+        userCache.set(chatId, userId, role, dbMember, firstName, username);
+        ctx.dbUser = dbMember;
+      } else {
+        await userRepository.upsertUser(userId, username, firstName, "BEYONDER");
+        const dbUser = await userRepository.getUserById(userId);
+        const role = dbUser?.role || "BEYONDER";
+        userCache.set(undefined, userId, role, dbUser, firstName, username);
+        ctx.dbUser = dbUser;
+      }
     } catch (err) {
       console.error(`[userSync] Error syncing user ${userId}:`, err);
     }
@@ -36,19 +46,31 @@ export async function userSyncMiddleware(ctx: MyContext, next: NextFunction): Pr
     const profileChanged =
       cached.lastSeenName !== firstName || cached.lastSeenUsername !== username;
 
-    const count = userCache.incrementMessages(userId);
+    const count = userCache.incrementMessages(chatId, userId);
 
     if (profileChanged || count >= 10) {
-      userCache.resetUnsavedMessages(userId);
-      userRepository
-        .upsertUser(userId, username, firstName, cached.role, count)
-        .then(async () => {
-          const dbUser = await userRepository.getUserById(userId);
-          userCache.set(userId, cached.role, dbUser, firstName, username);
-        })
-        .catch((err) => {
-          console.error(`[userSync] Background flush failed for ${userId}:`, err);
-        });
+      userCache.resetUnsavedMessages(chatId, userId);
+      if (chatId) {
+        userRepository
+          .upsertMember(chatId, userId, username, firstName, cached.role, count)
+          .then(async () => {
+            const dbMember = await userRepository.getMember(chatId, userId);
+            userCache.set(chatId, userId, cached.role, dbMember, firstName, username);
+          })
+          .catch((err) => {
+            console.error(`[userSync] Background flush failed for member ${userId} in ${chatId}:`, err);
+          });
+      } else {
+        userRepository
+          .upsertUser(userId, username, firstName, cached.role, count)
+          .then(async () => {
+            const dbUser = await userRepository.getUserById(userId);
+            userCache.set(undefined, userId, cached.role, dbUser, firstName, username);
+          })
+          .catch((err) => {
+            console.error(`[userSync] Background flush failed for ${userId}:`, err);
+          });
+      }
     }
 
     ctx.dbUser = cached.user;

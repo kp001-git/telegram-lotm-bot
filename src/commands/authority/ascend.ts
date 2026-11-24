@@ -67,24 +67,47 @@ export async function ascendCommand(ctx: MyContext): Promise<void> {
   }
 
   // 1. Update Turso
-  await userRepository.setRole(target.userId, targetRole);
-  userCache.invalidate(target.userId);
+  await userRepository.setMemberRole(chat.id, target.userId, targetRole);
+  userCache.invalidate(chat.id, target.userId);
 
-  // 2. Grant Telegram admin rights
+  // 2. Grant Telegram admin rights with valid Telegram Bot API boolean flags
+  let telegramAdminGranted = false;
+  let telegramAdminError: string | null = null;
   try {
-    await ctx.promoteChatMember(target.userId, {
+    await ctx.api.promoteChatMember(chat.id, target.userId, {
       can_manage_chat: true,
       can_delete_messages: true,
       can_restrict_members: true,
       can_pin_messages: true,
       can_invite_users: true,
-      is_anonymous: false,
+      can_manage_video_chats: true,
+      can_promote_members: false,
+      can_change_info: false,
     });
+    telegramAdminGranted = true;
   } catch (err: any) {
-    console.warn(`[ascend] Note: Telegram promoteChatMember for ${target.userId}:`, err?.message);
+    telegramAdminError = err?.description || err?.message || "Missing privileges";
+    console.warn(`[ascend] Note: Telegram promoteChatMember for ${target.userId}:`, telegramAdminError);
   }
 
-  // 3. Log audit
+  // 3. Set Custom Admin Title if promoted
+  if (telegramAdminGranted) {
+    const roleTitleMap: Record<BeyonderRole, string> = {
+      CELESTIAL_WORTHY: "Celestial Worthy",
+      THE_FOOL: "The Fool",
+      THE_WORLD: "The World",
+      THE_STAR: "The Star",
+      BEYONDER: "Beyonder",
+    };
+    const roleTitle = roleTitleMap[targetRole] || "Council Member";
+    try {
+      await ctx.api.setChatAdministratorCustomTitle(chat.id, target.userId, roleTitle);
+    } catch (err: any) {
+      console.warn(`[ascend] setChatAdministratorCustomTitle for ${target.userId}:`, err?.description || err?.message);
+    }
+  }
+
+  // 4. Log audit
   await auditRepository.logAndMirror(ctx.api, {
     chat_id: chat.id,
     actor_id: from.id,
@@ -93,13 +116,18 @@ export async function ascendCommand(ctx: MyContext): Promise<void> {
     reason: `Elevated to council seat: ${targetRole}`,
   });
 
+  const adminNotice = !telegramAdminGranted
+    ? `\n⚠️ <i>Notice: Council seat recorded in the mystical ledger, but native Telegram admin privileges could not be applied (${escapeHtml(telegramAdminError || "missing bot 'Add New Admins' permission")}).</i>`
+    : "";
+
   const response = [
     formatHeader("Divine Elevation"),
     `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has consumed the potion of authority and ascends to the council seat of ${formatRoleBadge(targetRole)}.`,
     `\n<b>Executor:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+    adminNotice,
     formatDivider(),
     `<i>The Tarot Club recognizes your sacred responsibilities.</i>`,
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });
 }
