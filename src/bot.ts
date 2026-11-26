@@ -5,6 +5,7 @@ import { config } from "./config";
 import { MyContext } from "./middlewares/context";
 import { userSyncMiddleware } from "./middlewares/user-sync";
 import { rbacMiddleware } from "./middlewares/rbac";
+import { chatDefenseMiddleware } from "./middlewares/chat-defense";
 import { errorHandler } from "./middlewares/error-handler";
 import { registerAuthorityCommands } from "./commands/authority";
 import { registerBoardCommands } from "./commands/board";
@@ -86,6 +87,9 @@ export function createBot(): Bot<MyContext> {
   // 5. Role-Based Access Control resolver
   bot.use(rbacMiddleware);
 
+  // 5.5. Passive Chat Defense (Spiritual Ward & Grey Fog Whispers)
+  bot.use(chatDefenseMiddleware);
+
   // 6. Authority & Moderation Commands
   registerAuthorityCommands(bot);
 
@@ -140,6 +144,14 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
       { command: "seal", description: "Seal sanctuary from regular speech" },
       { command: "unseal", description: "Lift divine silence from chat" },
       { command: "erase", description: "Purge heretical blasphemy and messages" },
+      { command: "corrupt", description: "Inflict mark of spiritual corruption (warn)" },
+      { command: "purify", description: "Cleanse 1 mark of corruption" },
+      { command: "corruption", description: "Inspect active corruption marks" },
+      { command: "cleanse", description: "Wipe all corruption marks clean" },
+      { command: "whisper", description: "Bind Grey Fog keyword or sticker filter" },
+      { command: "dispel", description: "Remove an active Grey Fog whisper" },
+      { command: "whispers", description: "List bound keyword triggers in sanctuary" },
+      { command: "ward", description: "Toggle Spiritual Ward anti-link barrier" },
     ]);
     console.log("[Bot] Complete command menu synchronized with Telegram.");
   } catch (err: any) {

@@ -13,6 +13,14 @@ import { releaseCommand } from "./release";
 import { sealCommand } from "./seal";
 import { unsealCommand } from "./unseal";
 import { eraseCommand } from "./erase";
+import { corruptCommand } from "./corrupt";
+import { purifyCommand, registerCorruptionCallbacks } from "./purify";
+import { corruptionCommand } from "./corruption";
+import { cleanseCommand } from "./cleanse";
+import { whisperCommand } from "./whisper";
+import { dispelCommand } from "./dispel";
+import { whispersCommand } from "./whispers";
+import { wardCommand } from "./ward";
 
 export * from "./celestial_worthy";
 export * from "./council";
@@ -25,6 +33,14 @@ export * from "./release";
 export * from "./seal";
 export * from "./unseal";
 export * from "./erase";
+export * from "./corrupt";
+export * from "./purify";
+export * from "./corruption";
+export * from "./cleanse";
+export * from "./whisper";
+export * from "./dispel";
+export * from "./whispers";
+export * from "./ward";
 
 export function registerAuthorityCommands(bot: Bot<MyContext>): void {
   // Foundational Information & Binding
@@ -93,5 +109,50 @@ export function registerAuthorityCommands(bot: Bot<MyContext>): void {
     groupOnlyGuard,
     requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD", "THE_STAR"),
     eraseCommand
+  );
+
+  // Phase B: Corruption / Warn System
+  bot.command(
+    "corrupt",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD", "THE_STAR"),
+    corruptCommand
+  );
+  bot.command(
+    "purify",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD", "THE_STAR"),
+    purifyCommand
+  );
+  bot.command("corruption", groupOnlyGuard, corruptionCommand);
+  bot.command(
+    "cleanse",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
+    cleanseCommand
+  );
+  registerCorruptionCallbacks(bot);
+
+  // Phase B: Grey Fog Whispers (Auto-Filters)
+  bot.command(
+    "whisper",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD", "THE_STAR"),
+    whisperCommand
+  );
+  bot.command(
+    "dispel",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD", "THE_STAR"),
+    dispelCommand
+  );
+  bot.command("whispers", groupOnlyGuard, whispersCommand);
+
+  // Phase B: Spiritual Ward (Anti-Link)
+  bot.command(
+    "ward",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
+    wardCommand
   );
 }

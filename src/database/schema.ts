@@ -35,7 +35,29 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       lore_text TEXT,
       welcome_template TEXT,
       is_sealed INTEGER DEFAULT 0,
-      log_chat_id TEXT
+      log_chat_id TEXT,
+      warn_limit INTEGER DEFAULT 3,
+      warn_punishment TEXT DEFAULT 'SILENCE',
+      ward_enabled INTEGER DEFAULT 0,
+      ward_whitelist TEXT DEFAULT 't.me,telegram.org'
+    );`,
+    `CREATE TABLE IF NOT EXISTS member_corruptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      chat_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      issued_by INTEGER NOT NULL,
+      reason TEXT,
+      created_at TEXT
+    );`,
+    `CREATE TABLE IF NOT EXISTS group_whispers (
+      chat_id INTEGER NOT NULL,
+      trigger_word TEXT NOT NULL,
+      response_type TEXT NOT NULL,
+      text_content TEXT,
+      file_id TEXT,
+      created_by INTEGER NOT NULL,
+      created_at TEXT,
+      PRIMARY KEY (chat_id, trigger_word)
     );`,
     `CREATE TABLE IF NOT EXISTS audit_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,17 +110,28 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
     `CREATE INDEX IF NOT EXISTS idx_group_members_role ON group_members(chat_id, role);`,
     `CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id);`,
     `CREATE INDEX IF NOT EXISTS idx_audit_logs_chat ON audit_logs(chat_id);`,
+    `CREATE INDEX IF NOT EXISTS idx_corruptions_chat_user ON member_corruptions(chat_id, user_id);`,
     `CREATE INDEX IF NOT EXISTS idx_polls_chat_status ON polls(chat_id, status);`,
     `CREATE INDEX IF NOT EXISTS idx_poll_votes_poll ON poll_votes(poll_id);`
   ];
 
   await client.batch(statements, "write");
 
-  // Safe migration for existing installations where suggestions table lacked chat_id
-  try {
-    await client.execute("ALTER TABLE suggestions ADD COLUMN chat_id INTEGER;");
-  } catch {
-    // Column already present or table created fresh with column
+  // Safe migrations for existing installations
+  const safeMigrations = [
+    "ALTER TABLE suggestions ADD COLUMN chat_id INTEGER;",
+    "ALTER TABLE group_settings ADD COLUMN warn_limit INTEGER DEFAULT 3;",
+    "ALTER TABLE group_settings ADD COLUMN warn_punishment TEXT DEFAULT 'SILENCE';",
+    "ALTER TABLE group_settings ADD COLUMN ward_enabled INTEGER DEFAULT 0;",
+    "ALTER TABLE group_settings ADD COLUMN ward_whitelist TEXT DEFAULT 't.me,telegram.org';",
+  ];
+
+  for (const sql of safeMigrations) {
+    try {
+      await client.execute(sql);
+    } catch {
+      // Column already present or table created fresh with column
+    }
   }
 
   // Create index on suggestions(chat_id) after column is guaranteed to exist

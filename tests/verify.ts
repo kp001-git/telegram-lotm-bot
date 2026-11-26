@@ -13,6 +13,9 @@ import { cooldownManager } from "../src/utils/cooldown";
 import { sanctuaryRepository } from "../src/database/repositories/sanctuary.repository";
 import { createHealthServer } from "../src/index";
 import { UNAUTHORIZED_GROUP_MESSAGE } from "../src/middlewares/guard";
+import { defenseRepository } from "../src/database/repositories/defense.repository";
+import { containsUnauthorizedLink, findMatchingWhisper } from "../src/middlewares/chat-defense";
+import { parseTriggerAndRest } from "../src/commands/authority/whisper";
 import pathwaysData from "../src/data/pathways.json";
 import tarotData from "../src/data/tarot_cards.json";
 import mysticalEvents from "../src/data/mystical_events.json";
@@ -41,6 +44,14 @@ async function runTests() {
   });
   await client.execute({
     sql: `DELETE FROM authorized_chats WHERE chat_id IN (-100555666777, -999888777);`,
+    args: [],
+  });
+  await client.execute({
+    sql: `DELETE FROM member_corruptions WHERE chat_id IN (-100111111, -100222222, -1009876543);`,
+    args: [],
+  });
+  await client.execute({
+    sql: `DELETE FROM group_whispers WHERE chat_id IN (-100111111, -100222222, -1009876543);`,
     args: [],
   });
   console.log("✔ Schema initialized and test state prepared.");
@@ -482,7 +493,115 @@ async function runTests() {
   }
   console.log("✔ Unauthorized whitelist exit notice formatting (Soul first, CW second) verified.");
 
-  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5 & Phase A Verification Tests Passed Flawlessly! 𓆪\n");
+  // 26. Phase B: Corruption Strike Accumulation & Loss of Control Threshold
+  const corruptChatId = -1009876543;
+  const corruptTargetId = 8880001;
+  await defenseRepository.clearCorruptions(corruptChatId, corruptTargetId);
+
+  const strike1 = await defenseRepository.addCorruption(corruptChatId, corruptTargetId, 7770001, "Spamming the fog");
+  const strike2 = await defenseRepository.addCorruption(corruptChatId, corruptTargetId, 7770001, "Disrespecting The Fool");
+  const strike3 = await defenseRepository.addCorruption(corruptChatId, corruptTargetId, 7770001, "Final heresy");
+  const wardCfg = await defenseRepository.getWardConfig(corruptChatId);
+
+  if (strike1 !== 1 || strike2 !== 2 || strike3 !== 3 || strike3 < wardCfg.warn_limit) {
+    throw new Error(`Corruption strike accumulation failed: ${strike1}, ${strike2}, ${strike3} (limit ${wardCfg.warn_limit})`);
+  }
+
+  const remainingAfterPurify = await defenseRepository.removeLatestCorruption(corruptChatId, corruptTargetId);
+  if (remainingAfterPurify !== 2) {
+    throw new Error(`Purify failed: expected 2 remaining, got ${remainingAfterPurify}`);
+  }
+
+  await defenseRepository.clearCorruptions(corruptChatId, corruptTargetId);
+  const afterCleanse = await defenseRepository.getCorruptions(corruptChatId, corruptTargetId);
+  if (afterCleanse.length !== 0) {
+    throw new Error(`Cleanse failed: expected 0 marks, got ${afterCleanse.length}`);
+  }
+  console.log("✔ Phase B Corruption strikes, purify, cleanse & Loss of Control threshold verified.");
+
+  // 27. Phase B: Grey Fog Whispers (Text & Sticker Binding, Matching & Dispel)
+  defenseRepository.clearCache(corruptChatId);
+  const parsedQuote = parseTriggerAndRest('"praise the fool" Preserving the dignity of The Fool!');
+  if (!parsedQuote || parsedQuote.trigger !== "praise the fool" || !parsedQuote.rest.includes("Preserving")) {
+    throw new Error(`Quoted trigger parsing failed: ${JSON.stringify(parsedQuote)}`);
+  }
+
+  await defenseRepository.setWhisper(
+    corruptChatId,
+    "praise the fool",
+    "TEXT",
+    "Preserving the dignity of {mention}!",
+    null,
+    7770001
+  );
+  await defenseRepository.setWhisper(
+    corruptChatId,
+    "monocle",
+    "STICKER",
+    null,
+    "CAACAgIAAxkBAAIBZ2TestStickerFileId",
+    7770001
+  );
+
+  const whispersMap = await defenseRepository.getChatWhispers(corruptChatId);
+  const textMatch = findMatchingWhisper("Let us all Praise the Fool today!", whispersMap);
+  const stickerMatch = findMatchingWhisper("Beware of Amon's monocle!", whispersMap);
+  const noMatch = findMatchingWhisper("Just a normal Beyonder greeting.", whispersMap);
+
+  if (!textMatch || textMatch.response_type !== "TEXT") {
+    throw new Error("Expected phrase whisper match for 'praise the fool'");
+  }
+  if (!stickerMatch || stickerMatch.response_type !== "STICKER" || !stickerMatch.file_id) {
+    throw new Error("Expected sticker whisper match for 'monocle'");
+  }
+  if (noMatch !== null) {
+    throw new Error("Expected no whisper match for unrelated text");
+  }
+
+  const dispelled = await defenseRepository.removeWhisper(corruptChatId, "monocle");
+  const afterDispel = await defenseRepository.getChatWhispers(corruptChatId);
+  if (!dispelled || afterDispel.has("monocle")) {
+    throw new Error("Dispel whisper failed to remove 'monocle' and invalidate cache");
+  }
+  console.log("✔ Phase B Grey Fog Whispers (text/sticker binding, matching & dispel) verified.");
+
+  // 28. Phase B: Spiritual Ward Anti-Link Detection & Domain Whitelisting
+  await defenseRepository.setWardEnabled(corruptChatId, true);
+  await defenseRepository.addWardDomain(corruptChatId, "https://www.youtube.com/watch?v=123");
+  const updatedWard = await defenseRepository.getWardConfig(corruptChatId);
+
+  if (updatedWard.ward_enabled !== 1 || !updatedWard.ward_whitelist.includes("youtube.com")) {
+    throw new Error(`Ward config update failed: ${JSON.stringify(updatedWard)}`);
+  }
+
+  const blockedUrlText = "Join this sketchy site https://evil-cult.xyz/ritual now";
+  const allowedTgText = "Join our channel https://t.me/tarotclub";
+  const allowedYtText = "Watch this lore video https://youtu.be or https://youtube.com/watch?v=abc";
+
+  const isBlocked = containsUnauthorizedLink(
+    blockedUrlText,
+    [{ type: "url", offset: 23, length: 27 }],
+    updatedWard.ward_whitelist
+  );
+  const isTgAllowed = containsUnauthorizedLink(
+    allowedTgText,
+    [{ type: "url", offset: 17, length: 22 }],
+    updatedWard.ward_whitelist
+  );
+  const isYtAllowed = containsUnauthorizedLink(
+    "Watch https://youtube.com/watch?v=abc",
+    [{ type: "url", offset: 6, length: 31 }],
+    updatedWard.ward_whitelist
+  );
+
+  if (!isBlocked) throw new Error("Ward failed to detect unauthorized external link");
+  if (isTgAllowed) throw new Error("Ward wrongly blocked whitelisted t.me link");
+  if (isYtAllowed) throw new Error("Ward wrongly blocked newly whitelisted youtube.com link");
+
+  await defenseRepository.setWardEnabled(corruptChatId, false);
+  console.log("✔ Phase B Spiritual Ward anti-link detection & whitelisting verified.");
+
+  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A & Phase B Verification Tests Passed Flawlessly! 𓆪\n");
 }
 
 runTests().catch((err) => {
