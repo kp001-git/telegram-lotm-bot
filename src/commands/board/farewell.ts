@@ -2,6 +2,20 @@ import { MyContext } from "../../middlewares/context";
 import { groupRepository } from "../../database/repositories/group.repository";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
+const moderationRemovals = new Map<string, number>();
+
+export function markModerationRemoval(chatId: number, userId: number): void {
+  moderationRemovals.set(`${chatId}:${userId}`, Date.now() + 30_000);
+}
+
+export function consumeModerationRemoval(chatId: number, userId: number): boolean {
+  const key = `${chatId}:${userId}`;
+  const expiresAt = moderationRemovals.get(key);
+  if (!expiresAt) return false;
+  moderationRemovals.delete(key);
+  return Date.now() < expiresAt;
+}
+
 /**
  * Replaces placeholders {mention}, {name}, {group}, {count} in the farewell template.
  */

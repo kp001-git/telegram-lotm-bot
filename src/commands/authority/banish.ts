@@ -1,5 +1,8 @@
 import { MyContext } from "../../middlewares/context";
 import { auditRepository } from "../../database/repositories/audit.repository";
+import { groupRepository } from "../../database/repositories/group.repository";
+import { markModerationRemoval } from "../board/farewell";
+import { renderModTemplate } from "./decree";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole } from "../../utils/resolver";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -31,6 +34,9 @@ export async function banishCommand(ctx: MyContext): Promise<void> {
     return;
   }
 
+  // Mark removal so left_chat_member listener does not send duplicate /farewell
+  markModerationRemoval(chat.id, target.userId);
+
   // Execute Telegram ban
   try {
     await ctx.banChatMember(target.userId);
@@ -53,14 +59,23 @@ export async function banishCommand(ctx: MyContext): Promise<void> {
     reason,
   });
 
-  const response = [
-    formatHeader("Eternal Banishment"),
-    `${formatUserMention(target.userId, target.firstName || "Corrupt Entity", target.username)} has been permanently yeeted into the abyss above the Grey Fog. Good riddance.`,
-    `\n<b>Crime:</b> ${escapeHtml(reason)}`,
-    `<b>Executed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
-    formatDivider(),
-    `<i>Nothing of value was lost today.</i>`,
-  ].join("\n");
+  const { ban_template } = await groupRepository.getModTemplates(chat.id);
+  const response = ban_template
+    ? renderModTemplate(ban_template, {
+        userId: target.userId,
+        firstName: target.firstName || "Corrupt Entity",
+        username: target.username,
+        reason,
+        duration: "Permanent",
+      })
+    : [
+        formatHeader("Eternal Banishment"),
+        `${formatUserMention(target.userId, target.firstName || "Corrupt Entity", target.username)} has been permanently yeeted into the abyss above the Grey Fog. Good riddance.`,
+        `\n<b>Crime:</b> ${escapeHtml(reason)}`,
+        `<b>Executed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+        formatDivider(),
+        `<i>Nothing of value was lost today.</i>`,
+      ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });
 }

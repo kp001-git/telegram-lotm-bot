@@ -1,5 +1,6 @@
 import { MyContext } from "../../middlewares/context";
 import { auditRepository } from "../../database/repositories/audit.repository";
+import { markModerationRemoval } from "../board/farewell";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole } from "../../utils/resolver";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -30,6 +31,9 @@ export async function exileCommand(ctx: MyContext): Promise<void> {
     });
     return;
   }
+
+  // Mark removal so left_chat_member listener does not send duplicate /farewell
+  markModerationRemoval(chat.id, target.userId);
 
   // Execute kick: ban followed immediately by unban
   try {

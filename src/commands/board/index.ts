@@ -7,7 +7,11 @@ import { sacredLawsCommand } from "./sacred_laws";
 import { mysteriesCommand } from "./mysteries";
 import { fateRecordsCommand } from "./fate_records";
 import { summoningCommand, renderWelcomeTemplate } from "./summoning";
-import { farewellCommand, renderFarewellTemplate } from "./farewell";
+import {
+  farewellCommand,
+  renderFarewellTemplate,
+  consumeModerationRemoval,
+} from "./farewell";
 import { loreCommand } from "./lore";
 import { groupRepository } from "../../database/repositories/group.repository";
 import { userRepository } from "../../database/repositories/user.repository";
@@ -96,6 +100,9 @@ export function registerBoardCommands(bot: Bot<MyContext>): void {
     const leftMember = ctx.message.left_chat_member;
     const chat = ctx.chat;
     if (!leftMember || leftMember.is_bot || !chat) return;
+
+    // Suppress duplicate farewell if member was removed via /banish or /exile
+    if (consumeModerationRemoval(chat.id, leftMember.id)) return;
 
     const goodbyeConfig = await groupRepository.getGoodbyeConfig(chat.id);
     if (!goodbyeConfig.enabled) return;

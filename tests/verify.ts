@@ -21,7 +21,12 @@ import {
   getSequenceTitle,
   getSequenceTierLabel,
 } from "../src/utils/sequences";
-import { renderFarewellTemplate } from "../src/commands/board/farewell";
+import {
+  renderFarewellTemplate,
+  markModerationRemoval,
+  consumeModerationRemoval,
+} from "../src/commands/board/farewell";
+import { renderModTemplate } from "../src/commands/authority/decree";
 import { isShadowSovereign, setShadowSovereignId } from "../src/config";
 import { requireRole } from "../src/middlewares/rbac";
 import pathwaysData from "../src/data/pathways.json";
@@ -784,7 +789,53 @@ async function runTests() {
   });
   console.log("✔ Silent Shadow Sovereign Override (supremacy, immunity, invisibility & stealth audit) verified.");
 
-  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A, Phase B, Phase C, Phase D & Shadow Sovereign Tests Passed Flawlessly! 𓆪\n");
+  // 33. Custom Ban/Mute Announcement Decrees & Duplicate Farewell Suppression
+  const decreeChatId = -100111111;
+  await groupRepository.setModTemplate(decreeChatId, "ban", "Banned {name}: {reason} ({duration})");
+  await groupRepository.setModTemplate(decreeChatId, "mute", "Silenced {name} for {duration}: {reason}");
+  const modTemplates = await groupRepository.getModTemplates(decreeChatId);
+
+  if (!modTemplates.ban_template || !modTemplates.mute_template) {
+    throw new Error(`setModTemplate / getModTemplates failed: ${JSON.stringify(modTemplates)}`);
+  }
+
+  const renderedBan = renderModTemplate(modTemplates.ban_template, {
+    userId: 8880001,
+    firstName: "Leonard",
+    username: "leonard_mitchell",
+    reason: "Heresy",
+    duration: "Permanent",
+  });
+  const renderedMute = renderModTemplate(modTemplates.mute_template, {
+    userId: 8880001,
+    firstName: "Leonard",
+    username: "leonard_mitchell",
+    reason: "Spam",
+    duration: "2 hours",
+  });
+
+  if (
+    !renderedBan.includes("Banned Leonard: Heresy (Permanent)") ||
+    !renderedMute.includes("Silenced Leonard for 2 hours: Spam")
+  ) {
+    throw new Error(`renderModTemplate failed: ${renderedBan} | ${renderedMute}`);
+  }
+
+  await groupRepository.setModTemplate(decreeChatId, "ban", null);
+  await groupRepository.setModTemplate(decreeChatId, "mute", null);
+  const resetTemplates = await groupRepository.getModTemplates(decreeChatId);
+  if (resetTemplates.ban_template !== null || resetTemplates.mute_template !== null) {
+    throw new Error(`Resetting mod templates failed: ${JSON.stringify(resetTemplates)}`);
+  }
+
+  // Verify moderation removal suppression
+  markModerationRemoval(decreeChatId, 8880001);
+  if (!consumeModerationRemoval(decreeChatId, 8880001) || consumeModerationRemoval(decreeChatId, 8880001)) {
+    throw new Error("Moderation removal suppression failed (should consume once)");
+  }
+  console.log("✔ Custom Ban/Mute announcement decrees & duplicate farewell suppression verified.");
+
+  console.log("\n𓆩 All Verification Tests Passed Flawlessly! 𓆪\n");
 }
 
 runTests().catch((err) => {

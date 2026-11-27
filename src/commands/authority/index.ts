@@ -22,6 +22,7 @@ import { dispelCommand } from "./dispel";
 import { whispersCommand } from "./whispers";
 import { wardCommand } from "./ward";
 import { bestowCommand } from "./bestow";
+import { decreeCommand } from "./decree";
 
 export * from "./celestial_worthy";
 export * from "./council";
@@ -43,6 +44,7 @@ export * from "./dispel";
 export * from "./whispers";
 export * from "./ward";
 export * from "./bestow";
+export * from "./decree";
 
 export function registerAuthorityCommands(bot: Bot<MyContext>): void {
   // Foundational Information & Binding
@@ -164,5 +166,13 @@ export function registerAuthorityCommands(bot: Bot<MyContext>): void {
     groupOnlyGuard,
     requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
     bestowCommand
+  );
+
+  // Custom Ban / Mute Announcement Decrees
+  bot.command(
+    "decree",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
+    decreeCommand
   );
 }

@@ -10,6 +10,8 @@ export interface GroupSettings {
   welcome_enabled?: number;
   goodbye_enabled?: number;
   goodbye_template?: string | null;
+  ban_template?: string | null;
+  mute_template?: string | null;
   is_sealed: number;
   log_chat_id: string | null;
 }
@@ -169,6 +171,39 @@ export class GroupRepository {
           goodbye_enabled = excluded.goodbye_enabled;
       `,
       args: [chatId, val],
+    });
+  }
+
+  async getModTemplates(
+    chatId: number
+  ): Promise<{ ban_template: string | null; mute_template: string | null }> {
+    const settings = await this.getSettings(chatId);
+    return {
+      ban_template:
+        settings?.ban_template && settings.ban_template.trim().length > 0
+          ? settings.ban_template
+          : null,
+      mute_template:
+        settings?.mute_template && settings.mute_template.trim().length > 0
+          ? settings.mute_template
+          : null,
+    };
+  }
+
+  async setModTemplate(
+    chatId: number,
+    type: "ban" | "mute",
+    template: string | null
+  ): Promise<void> {
+    const column = type === "ban" ? "ban_template" : "mute_template";
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, ${column})
+        VALUES (?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          ${column} = excluded.${column};
+      `,
+      args: [chatId, template],
     });
   }
 

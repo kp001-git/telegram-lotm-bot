@@ -42,6 +42,7 @@ export async function divinationCommand(ctx: MyContext): Promise<void> {
       ` • <code>/ward &lt;on|off|allow|disallow|list&gt;</code> — Manage Spiritual Ward anti-link barrier`,
       ` • <code>/summoning</code> — Preview, toggle, or set welcome rites`,
       ` • <code>/farewell</code> — Preview, toggle, or set departure rites`,
+      ` • <code>/decree &lt;ban|mute&gt; &lt;text|reset&gt;</code> — Customize ban/mute decrees`,
       ""
     );
   }

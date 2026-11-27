@@ -158,6 +158,7 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
     { command: "ward", description: "Toggle Spiritual Ward anti-link barrier" },
     { command: "summoning", description: "Preview, toggle, or set welcoming rites" },
     { command: "farewell", description: "Preview, toggle, or set departure rites" },
+    { command: "decree", description: "Customize ban or mute announcement templates" },
   ];
 
   try {

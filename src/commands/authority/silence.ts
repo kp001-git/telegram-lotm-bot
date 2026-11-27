@@ -1,5 +1,7 @@
 import { MyContext } from "../../middlewares/context";
 import { auditRepository } from "../../database/repositories/audit.repository";
+import { groupRepository } from "../../database/repositories/group.repository";
+import { renderModTemplate } from "./decree";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole, parseDuration } from "../../utils/resolver";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -81,15 +83,24 @@ export async function silenceCommand(ctx: MyContext): Promise<void> {
     reason: `${duration.label} | ${reason}`,
   });
 
-  const response = [
-    formatHeader("Domain of Silence"),
-    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)}'s voice has been muffled in the Grey Fog.`,
-    `\n<b>Duration:</b> ${escapeHtml(duration.label)}`,
-    `<b>Reason:</b> ${escapeHtml(reason)}`,
-    `<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
-    formatDivider(),
-    `<i>The power of speech remains inaccessible until the fog recedes.</i>`,
-  ].join("\n");
+  const { mute_template } = await groupRepository.getModTemplates(chat.id);
+  const response = mute_template
+    ? renderModTemplate(mute_template, {
+        userId: target.userId,
+        firstName: target.firstName || "Beyonder",
+        username: target.username,
+        reason,
+        duration: duration.label,
+      })
+    : [
+        formatHeader("Domain of Silence"),
+        `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)}'s voice has been muffled in the Grey Fog.`,
+        `\n<b>Duration:</b> ${escapeHtml(duration.label)}`,
+        `<b>Reason:</b> ${escapeHtml(reason)}`,
+        `<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+        formatDivider(),
+        `<i>The power of speech remains inaccessible until the fog recedes.</i>`,
+      ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });
 }

@@ -39,6 +39,8 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       welcome_enabled INTEGER DEFAULT 1,
       goodbye_enabled INTEGER DEFAULT 1,
       goodbye_template TEXT,
+      ban_template TEXT,
+      mute_template TEXT,
       is_sealed INTEGER DEFAULT 0,
       log_chat_id TEXT,
       warn_limit INTEGER DEFAULT 3,
@@ -132,6 +134,8 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
     "ALTER TABLE group_settings ADD COLUMN welcome_enabled INTEGER DEFAULT 1;",
     "ALTER TABLE group_settings ADD COLUMN goodbye_enabled INTEGER DEFAULT 1;",
     "ALTER TABLE group_settings ADD COLUMN goodbye_template TEXT;",
+    "ALTER TABLE group_settings ADD COLUMN ban_template TEXT;",
+    "ALTER TABLE group_settings ADD COLUMN mute_template TEXT;",
     "ALTER TABLE group_members ADD COLUMN spirituality_xp INTEGER DEFAULT 0;",
     "ALTER TABLE group_members ADD COLUMN custom_position TEXT;",
   ];
