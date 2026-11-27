@@ -11,6 +11,7 @@ import { registerAuthorityCommands } from "./commands/authority";
 import { registerBoardCommands } from "./commands/board";
 import { registerGovernanceCommands } from "./commands/governance";
 import { registerMysticalCommands } from "./commands/mystical";
+import { registerDmCommands } from "./commands/dm";
 import { sanctuaryRepository } from "./database/repositories/sanctuary.repository";
 import { UNAUTHORIZED_GROUP_MESSAGE } from "./middlewares/guard";
 
@@ -90,6 +91,9 @@ export function createBot(): Bot<MyContext> {
   // 5.5. Passive Chat Defense (Spiritual Ward & Grey Fog Whispers)
   bot.use(chatDefenseMiddleware);
 
+  // 5.8. Private DM Group Management & Deep-Link /start Handler
+  registerDmCommands(bot);
+
   // 6. Authority & Moderation Commands
   registerAuthorityCommands(bot);
 
@@ -159,6 +163,15 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
     { command: "summoning", description: "Preview, toggle, or set welcoming rites" },
     { command: "farewell", description: "Preview, toggle, or set departure rites" },
     { command: "decree", description: "Customize ban or mute announcement templates" },
+    { command: "connect", description: "Manage sanctuary settings privately in DM" },
+  ];
+
+  const privateDmCommands = [
+    { command: "connect", description: "Connect DM session to a whitelisted sanctuary" },
+    { command: "manage", description: "Open interactive DM Sanctuary Control Panel" },
+    { command: "sanctuaries", description: "Switch between your authorized sanctuaries" },
+    { command: "disconnect", description: "Sever active DM sanctuary connection" },
+    { command: "cancel", description: "Abort pending DM input prompt" },
   ];
 
   try {
@@ -168,6 +181,9 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
     });
     await bot.api.setMyCommands([...adminCommands, ...memberCommands], {
       scope: { type: "all_chat_administrators" },
+    });
+    await bot.api.setMyCommands([...privateDmCommands, ...memberCommands], {
+      scope: { type: "all_private_chats" },
     });
     console.log("[Bot] Role-scoped command menus synchronized with Telegram.");
   } catch (err: any) {

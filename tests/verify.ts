@@ -27,6 +27,7 @@ import {
   consumeModerationRemoval,
 } from "../src/commands/board/farewell";
 import { renderModTemplate } from "../src/commands/authority/decree";
+import { verifyDmGroupAdmin } from "../src/middlewares/dm-auth";
 import { isShadowSovereign, setShadowSovereignId } from "../src/config";
 import { requireRole } from "../src/middlewares/rbac";
 import pathwaysData from "../src/data/pathways.json";
@@ -834,6 +835,72 @@ async function runTests() {
     throw new Error("Moderation removal suppression failed (should consume once)");
   }
   console.log("✔ Custom Ban/Mute announcement decrees & duplicate farewell suppression verified.");
+
+  // 34. Private DM Group Management (dm_sessions, verifyDmGroupAdmin & corruption policy)
+  const dmChatId = -100111111;
+  const councilUserId = 8880002;
+  const regularUserId = 8880003;
+  const shadowDmUserId = 9990001;
+
+  await sanctuaryRepository.authorizeChat(dmChatId, "DM Test Sanctuary");
+  await userRepository.upsertMember(dmChatId, councilUserId, "alger_wilson", "Alger", "THE_WORLD", 1, 0);
+  await userRepository.setMemberRole(dmChatId, councilUserId, "THE_WORLD");
+  await userRepository.upsertMember(dmChatId, regularUserId, "regular_joe", "Joe", "BEYONDER", 1, 0);
+
+  const mockCtx = {
+    api: {
+      getChatMember: async () => ({ status: "member" }),
+    },
+  } as any;
+
+  const isCouncilAuthorized = await verifyDmGroupAdmin(mockCtx, councilUserId, dmChatId);
+  const isRegularAuthorized = await verifyDmGroupAdmin(mockCtx, regularUserId, dmChatId);
+
+  setShadowSovereignId(shadowDmUserId);
+  const isShadowAuthorized = await verifyDmGroupAdmin(mockCtx, shadowDmUserId, dmChatId);
+  const shadowGroups = await groupRepository.getAdminAuthorizedGroups(shadowDmUserId);
+  setShadowSovereignId(null);
+
+  if (!isCouncilAuthorized) {
+    throw new Error("verifyDmGroupAdmin should allow Council member");
+  }
+  if (isRegularAuthorized) {
+    throw new Error("verifyDmGroupAdmin must reject regular BEYONDER");
+  }
+  if (!isShadowAuthorized || !shadowGroups.some((g) => g.chat_id === dmChatId)) {
+    throw new Error("Shadow Sovereign must be authorized for all whitelisted groups in DM");
+  }
+
+  // Test dm_sessions persistence
+  await groupRepository.setDmSession(councilUserId, dmChatId, "WELCOME_TEXT");
+  const dmSession1 = await groupRepository.getDmSession(councilUserId);
+  await groupRepository.setDmPendingInput(councilUserId, null);
+  const dmSession2 = await groupRepository.getDmSession(councilUserId);
+  if (
+    !dmSession1 ||
+    dmSession1.active_chat_id !== dmChatId ||
+    dmSession1.pending_input !== "WELCOME_TEXT" ||
+    dmSession2?.pending_input !== null
+  ) {
+    throw new Error(`dm_sessions persistence failed: ${JSON.stringify(dmSession1)} | ${JSON.stringify(dmSession2)}`);
+  }
+
+  // Test updateCorruptionPolicy + cache invalidation
+  await groupRepository.updateCorruptionPolicy(dmChatId, 5, "BANISH");
+  const updatedPolicy = await defenseRepository.getWardConfig(dmChatId);
+  if (updatedPolicy.warn_limit !== 5 || updatedPolicy.warn_punishment !== "BANISH") {
+    throw new Error(`updateCorruptionPolicy failed: ${JSON.stringify(updatedPolicy)}`);
+  }
+
+  // Clean up DM test state
+  await groupRepository.updateCorruptionPolicy(dmChatId, 3, "SILENCE");
+  await groupRepository.disconnectDmSession(councilUserId);
+  await sanctuaryRepository.deauthorizeChat(dmChatId);
+  await client.execute({
+    sql: `DELETE FROM group_members WHERE chat_id = ? AND user_id = ?;`,
+    args: [dmChatId, regularUserId],
+  });
+  console.log("✔ Private DM Group Management (dm_sessions, verifyDmGroupAdmin & policy updates) verified.");
 
   console.log("\n𓆩 All Verification Tests Passed Flawlessly! 𓆪\n");
 }

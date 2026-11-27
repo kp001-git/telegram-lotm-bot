@@ -1,6 +1,16 @@
+import { Api } from "grammy";
 import { getDatabaseClient } from "../client";
+import { isShadowSovereign } from "../../config";
+import { defenseRepository, WarnPunishment } from "./defense.repository";
 import defaultLaws from "../../data/sacred_laws.json";
 import defaultLore from "../../data/default_lore.json";
+
+export interface DmSession {
+  active_chat_id: number;
+  pending_input: string | null;
+}
+
+const DM_SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface GroupSettings {
   chat_id: number;
@@ -43,6 +53,7 @@ export function getDefaultLoreText(): string {
 
 export class GroupRepository {
   private client = getDatabaseClient();
+  private dmSessionCache = new Map<number, { data: DmSession | null; expiresAt: number }>();
 
   async getSettings(chatId: number): Promise<GroupSettings | null> {
     const result = await this.client.execute({
@@ -210,6 +221,164 @@ export class GroupRepository {
   async isChatSealed(chatId: number): Promise<boolean> {
     const settings = await this.getSettings(chatId);
     return settings ? settings.is_sealed === 1 : false;
+  }
+
+  // =========================================================================
+  // DM Group Management Sessions & Policies
+  // =========================================================================
+
+  async setDmSession(
+    userId: number,
+    chatId: number,
+    pendingInput: string | null = null
+  ): Promise<void> {
+    const now = new Date().toISOString();
+    await this.client.execute({
+      sql: `
+        INSERT INTO dm_sessions (user_id, active_chat_id, pending_input, updated_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+          active_chat_id = excluded.active_chat_id,
+          pending_input = excluded.pending_input,
+          updated_at = excluded.updated_at;
+      `,
+      args: [userId, chatId, pendingInput, now],
+    });
+
+    this.dmSessionCache.set(userId, {
+      data: { active_chat_id: chatId, pending_input: pendingInput },
+      expiresAt: Date.now() + DM_SESSION_TTL_MS,
+    });
+  }
+
+  async getDmSession(userId: number): Promise<DmSession | null> {
+    const cached = this.dmSessionCache.get(userId);
+    if (cached && Date.now() < cached.expiresAt) {
+      return cached.data;
+    }
+
+    const res = await this.client.execute({
+      sql: `SELECT active_chat_id, pending_input FROM dm_sessions WHERE user_id = ? LIMIT 1;`,
+      args: [userId],
+    });
+
+    const data: DmSession | null =
+      res.rows.length > 0
+        ? {
+            active_chat_id: Number(res.rows[0].active_chat_id),
+            pending_input: (res.rows[0].pending_input as string | null) ?? null,
+          }
+        : null;
+
+    this.dmSessionCache.set(userId, {
+      data,
+      expiresAt: Date.now() + DM_SESSION_TTL_MS,
+    });
+
+    return data;
+  }
+
+  async setDmPendingInput(userId: number, pendingInput: string | null): Promise<void> {
+    const now = new Date().toISOString();
+    await this.client.execute({
+      sql: `UPDATE dm_sessions SET pending_input = ?, updated_at = ? WHERE user_id = ?;`,
+      args: [pendingInput, now, userId],
+    });
+
+    const existing = this.dmSessionCache.get(userId);
+    if (existing && existing.data) {
+      this.dmSessionCache.set(userId, {
+        data: { ...existing.data, pending_input: pendingInput },
+        expiresAt: Date.now() + DM_SESSION_TTL_MS,
+      });
+    } else {
+      this.dmSessionCache.delete(userId);
+    }
+  }
+
+  async disconnectDmSession(userId: number): Promise<void> {
+    await this.client.execute({
+      sql: `DELETE FROM dm_sessions WHERE user_id = ?;`,
+      args: [userId],
+    });
+    this.dmSessionCache.delete(userId);
+  }
+
+  async getAuthorizedChatTitle(chatId: number): Promise<string | null> {
+    const res = await this.client.execute({
+      sql: `SELECT title FROM authorized_chats WHERE chat_id = ? LIMIT 1;`,
+      args: [chatId],
+    });
+    return res.rows.length > 0 ? (res.rows[0].title as string | null) : null;
+  }
+
+  async getAdminAuthorizedGroups(
+    userId: number,
+    api?: Api
+  ): Promise<Array<{ chat_id: number; title: string | null }>> {
+    const chatsRes = await this.client.execute({
+      sql: `SELECT chat_id, title FROM authorized_chats ORDER BY approved_at DESC;`,
+      args: [],
+    });
+
+    const allChats = chatsRes.rows.map((r) => ({
+      chat_id: Number(r.chat_id),
+      title: (r.title as string | null) ?? null,
+    }));
+
+    if (isShadowSovereign(userId)) {
+      return allChats;
+    }
+
+    // 1. Check DB Council memberships in a single query
+    const councilRes = await this.client.execute({
+      sql: `
+        SELECT chat_id FROM group_members
+        WHERE user_id = ? AND role IN ('CELESTIAL_WORTHY', 'THE_FOOL', 'THE_WORLD', 'THE_STAR');
+      `,
+      args: [userId],
+    });
+    const councilChatIds = new Set<number>(councilRes.rows.map((r) => Number(r.chat_id)));
+
+    const authorizedForAdmin: Array<{ chat_id: number; title: string | null }> = [];
+    for (const chat of allChats) {
+      if (councilChatIds.has(chat.chat_id)) {
+        authorizedForAdmin.push(chat);
+        continue;
+      }
+
+      if (api) {
+        try {
+          const member = await api.getChatMember(chat.chat_id, userId);
+          if (member.status === "administrator" || member.status === "creator") {
+            authorizedForAdmin.push(chat);
+          }
+        } catch {
+          // Ignore if bot cannot query chat member
+        }
+      }
+    }
+
+    return authorizedForAdmin;
+  }
+
+  async updateCorruptionPolicy(
+    chatId: number,
+    warnLimit: number,
+    warnPunishment: WarnPunishment
+  ): Promise<void> {
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, warn_limit, warn_punishment)
+        VALUES (?, ?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          warn_limit = excluded.warn_limit,
+          warn_punishment = excluded.warn_punishment;
+      `,
+      args: [chatId, warnLimit, warnPunishment],
+    });
+
+    defenseRepository.clearCache(chatId);
   }
 }
 

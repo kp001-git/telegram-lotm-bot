@@ -43,6 +43,8 @@ export async function divinationCommand(ctx: MyContext): Promise<void> {
       ` • <code>/summoning</code> — Preview, toggle, or set welcome rites`,
       ` • <code>/farewell</code> — Preview, toggle, or set departure rites`,
       ` • <code>/decree &lt;ban|mute&gt; &lt;text|reset&gt;</code> — Customize ban/mute decrees`,
+      ` • <code>/connect</code> — Open private DM Sanctuary Control Panel`,
+      ` • <code>/manage</code> — Manage connected sanctuary in DM`,
       ""
     );
   }

@@ -113,6 +113,12 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       value TEXT,
       updated_at TEXT
     );`,
+    `CREATE TABLE IF NOT EXISTS dm_sessions (
+      user_id INTEGER PRIMARY KEY,
+      active_chat_id INTEGER NOT NULL,
+      pending_input TEXT,
+      updated_at TEXT
+    );`,
     `CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);`,
     `CREATE INDEX IF NOT EXISTS idx_group_members_role ON group_members(chat_id, role);`,
     `CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id);`,

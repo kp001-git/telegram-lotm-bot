@@ -25,8 +25,8 @@ export * from "./farewell";
 export * from "./lore";
 
 export function registerBoardCommands(bot: Bot<MyContext>): void {
-  // 1. Directory & Navigation
-  bot.command(["divination", "start", "help"], divinationCommand);
+  // 1. Directory & Navigation (/start is handled by registerDmCommands)
+  bot.command(["divination", "help"], divinationCommand);
 
   // 2. Information Board & Decrees
   bot.command("sacred_laws", sacredLawsCommand);
