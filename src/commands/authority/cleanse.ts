@@ -43,11 +43,11 @@ export async function cleanseCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Grand Spiritual Cleansing"),
-    `🕊 All marks of corruption have been completely wiped from ${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)}.`,
+    `🕊 All corruption marks wiped clean from ${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)}. Enjoy the second chance you definitely didn't earn.`,
     `\n<b>Current Corruption:</b> <code>[0/${wardConfig.warn_limit}]</code>`,
     `<b>Cleansed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>"May the Gray Fog shield your spirit body from future whispers."</i>`,
+    `<i>"Try not to speedrun back to [${wardConfig.warn_limit}/${wardConfig.warn_limit}] by tomorrow."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

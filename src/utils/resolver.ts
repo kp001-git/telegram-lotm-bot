@@ -279,14 +279,14 @@ export function canActOnTarget(
   if (actorId === targetId) {
     return {
       allowed: false,
-      reason: "𓆩 You cannot direct divine judgment upon yourself. 𓆪",
+      reason: "𓆩 Trying to moderate yourself? Even a Sequence 9 fool isn't usually this desperate for attention. 𓆪",
     };
   }
 
   if (botId && targetId === botId) {
     return {
       allowed: false,
-      reason: "𓆩 The vessel above the Grey Fog cannot be subjected to mortal constraints. 𓆪",
+      reason: "𓆩 Did you seriously just try to moderate the Sovereign above the Grey Fog? Know your place before I erase your Sequence entirely. 𓆪",
     };
   }
 
@@ -301,7 +301,7 @@ export function canActOnTarget(
     return {
       allowed: false,
       reason:
-        "𓆩 The Grey Fog bends only to higher sequence authority. You cannot moderate a Beyonder of equal or higher sequence rank. 𓆪",
+        "𓆩 Sit down, little Beyonder. You don't have the rank, the power, or the spine to touch someone of equal or higher Sequence. 𓆪",
     };
   }
 

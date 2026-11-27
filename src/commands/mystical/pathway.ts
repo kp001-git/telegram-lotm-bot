@@ -43,7 +43,7 @@ export async function pathwayCommand(ctx: MyContext): Promise<void> {
     const pathway = findPathway(targetName);
     if (!pathway) {
       await ctx.reply(
-        `𓆩 The spirit world does not recognize '${escapeHtml(targetName)}'. Inquire via <code>/pathway</code> to view the 22 canonical paths. 𓆪`,
+        `𓆩 '${escapeHtml(targetName)}' isn't even a real pathway. Did you make that up or just fail spelling? Run <code>/pathway</code> to read the 22 actual paths. 𓆪`,
         { parse_mode: "HTML" }
       );
       return;
@@ -56,14 +56,14 @@ export async function pathwayCommand(ctx: MyContext): Promise<void> {
 
     const response = [
       formatHeader("Beyonder Initiation Confirmed"),
-      `${formatUserMention(from.id, from.first_name, from.username)} has consumed the initiation potion of the <b>${escapeHtml(
+      `${formatUserMention(from.id, from.first_name, from.username)} swallowed the initiation potion of the <b>${escapeHtml(
         pathway.name
-      )}</b>.`,
+      )}</b>. Try not to lose control before Tuesday.`,
       `\n<b>Current Rank:</b> Sequence 9 — <b>${escapeHtml(seq9Name)}</b>`,
       `<b>Above-the-Sequence Domain:</b> <i>${escapeHtml(pathway.group)}</i>`,
       `<b>Core Authority:</b> ${escapeHtml(pathway.authority)}`,
       formatDivider(),
-      `<i>"Digest your potion with care. Act in accordance with your sequence name."</i>`,
+      `<i>"Digest the potion properly, or become another cautionary stain on the wall."</i>`,
     ].join("\n");
 
     await ctx.reply(response, { parse_mode: "HTML" });

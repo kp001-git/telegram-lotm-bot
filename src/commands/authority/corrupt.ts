@@ -14,13 +14,13 @@ export async function corruptCommand(ctx: MyContext): Promise<void> {
 
   if (!target) {
     await ctx.reply(
-      "𓆩 Specify a Beyonder via reply, User ID, or @username to inflict a mark of corruption. 𓆪",
+      "𓆩 Tag someone, reply to their nonsense, or drop a User ID. Even a Sequence 9 fool knows how to point a finger. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
   }
 
-  const reason = rawReason.trim() || "Spiritual transgression against the Tarot Club";
+  const reason = rawReason.trim() || "Existing loudly without common sense";
 
   const currentTargetRole = await resolveUserRole(ctx, target.userId);
   const botInfo = ctx.me;
@@ -99,12 +99,12 @@ export async function corruptCommand(ctx: MyContext): Promise<void> {
 
     const locResponse = [
       formatHeader("Loss of Control Above the Grey Fog"),
-      `☠️ ${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has succumbed to madness at <b>[${count}/${warnLimit}]</b> corruption marks!`,
-      `\n<b>Final Transgression:</b> ${escapeHtml(reason)}`,
+      `☠️ ${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} finally hit <b>[${count}/${warnLimit}]</b> corruption marks and imploded like cheap glassware!`,
+      `\n<b>Final Clown Act:</b> ${escapeHtml(reason)}`,
       `<b>Divine Sentence:</b> ${escapeHtml(punishmentOutcome)}`,
-      `<b>Executor:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+      `<b>Executed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
       formatDivider(),
-      `<i>Their corruption slate has been reset following judgment.</i>`,
+      `<i>Corruption slate wiped clean—though we can't say the same for your reputation.</i>`,
     ].join("\n");
 
     await ctx.reply(locResponse, { parse_mode: "HTML" });
@@ -119,12 +119,12 @@ export async function corruptCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Mark of Spiritual Corruption"),
-    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has been afflicted with a mark of corruption.`,
+    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} just earned themselves a shiny new mark of corruption. Congrats on making poor life choices.`,
     `\n<b>Corruption Level:</b> <code>[${count}/${warnLimit}]</code>`,
-    `<b>Reason:</b> ${escapeHtml(reason)}`,
+    `<b>Crime:</b> ${escapeHtml(reason)}`,
     `<b>Inscribed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>"Beware the whispers of the cosmos, lest you lose control at [${warnLimit}/${warnLimit}]."</i>`,
+    `<i>"Keep pushing your luck and watch what happens at [${warnLimit}/${warnLimit}]."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML", reply_markup: keyboard });

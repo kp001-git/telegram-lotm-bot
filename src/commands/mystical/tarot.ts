@@ -32,7 +32,7 @@ export async function tarotCommand(ctx: MyContext): Promise<void> {
     formatDivider(),
     `🕯 <b>Spiritual Guidance:</b>\n${escapeHtml(card.guidance)}`,
     formatDivider(),
-    `<i>"The cards do not dictate destiny; they reveal the unseen currents of the fog."</i>`,
+    `<i>"The cards aren't rigged—your fate really is just that mediocre."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

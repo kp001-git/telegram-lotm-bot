@@ -109,55 +109,66 @@ export function createBot(): Bot<MyContext> {
 }
 
 export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
+  const memberCommands = [
+    // Board & Information
+    { command: "divination", description: "Astrological directory of divine commands" },
+    { command: "sacred_laws", description: "View Tarot Club sacred decrees" },
+    { command: "mysteries", description: "Live overview of sanctuary domain" },
+    { command: "fate_records", description: "Activity ledger and top Beyonders" },
+    { command: "lore", description: "Chronicles and ethos of Grey Fog" },
+    { command: "whispers", description: "List bound keyword triggers in sanctuary" },
+    { command: "corruption", description: "Inspect active corruption marks" },
+    // Mystical & Progression
+    { command: "pathway", description: "Inquire or choose from 22 pathways" },
+    { command: "sequence", description: "Inquire sequence hierarchy and rank" },
+    { command: "potion", description: "Retrieve formulas and acting methods" },
+    { command: "tarot", description: "Draw guidance from Major Arcana" },
+    { command: "fate", description: "Spirit pendulum fortune and prophecy" },
+    { command: "prayer", description: "Recite supplication to The Fool" },
+    { command: "ritual", description: "Convoke interactive Grey Fog ceremony" },
+    { command: "leaderboard", description: "Top Beyonders by Sequence & XP" },
+    { command: "status", description: "Inspect Beyonder dossier & Sequence progress" },
+    // Governance & Community
+    { command: "suggest", description: "Submit feature proposal to Council" },
+    { command: "idea", description: "Propose events or community initiatives" },
+    { command: "report", description: "Report bugs or anomalies to Council" },
+    { command: "vote", description: "Participate in community deliberations" },
+    { command: "suggestions", description: "View approved development ledger" },
+    { command: "council", description: "Tarot Club executive hierarchy" },
+    { command: "celestial_worthy", description: "Supreme Owner dossier" },
+  ];
+
+  const adminCommands = [
+    // Authority & Moderation
+    { command: "ascend", description: "Promote Beyonder to council seat" },
+    { command: "degrade", description: "Demote council member to Beyonder" },
+    { command: "bestow", description: "Grant or clear custom honorific position" },
+    { command: "banish", description: "Permanently ban corrupt entity" },
+    { command: "exile", description: "Expel entity from sanctuary" },
+    { command: "silence", description: "Mute voice in the Grey Fog" },
+    { command: "release", description: "Lift silence from Beyonder" },
+    { command: "seal", description: "Seal sanctuary from regular speech" },
+    { command: "unseal", description: "Lift divine silence from chat" },
+    { command: "erase", description: "Purge heretical blasphemy and messages" },
+    { command: "corrupt", description: "Inflict mark of spiritual corruption (warn)" },
+    { command: "purify", description: "Cleanse 1 mark of corruption" },
+    { command: "cleanse", description: "Wipe all corruption marks clean" },
+    { command: "whisper", description: "Bind Grey Fog keyword or sticker filter" },
+    { command: "dispel", description: "Remove an active Grey Fog whisper" },
+    { command: "ward", description: "Toggle Spiritual Ward anti-link barrier" },
+    { command: "summoning", description: "Preview, toggle, or set welcoming rites" },
+    { command: "farewell", description: "Preview, toggle, or set departure rites" },
+  ];
+
   try {
-    await bot.api.setMyCommands([
-      // Board & Information
-      { command: "divination", description: "Astrological directory of divine commands" },
-      { command: "sacred_laws", description: "View or set Tarot Club sacred decrees" },
-      { command: "mysteries", description: "Live overview of sanctuary domain" },
-      { command: "fate_records", description: "Activity ledger and top Beyonders" },
-      { command: "summoning", description: "Preview, toggle, or set welcoming rites" },
-      { command: "farewell", description: "Preview, toggle, or set departure rites" },
-      { command: "lore", description: "Chronicles and ethos of Grey Fog" },
-      // Mystical & Lore
-      { command: "pathway", description: "Inquire or choose from 22 pathways" },
-      { command: "sequence", description: "Inquire sequence hierarchy and rank" },
-      { command: "potion", description: "Retrieve formulas and acting methods" },
-      { command: "tarot", description: "Draw guidance from Major Arcana" },
-      { command: "fate", description: "Spirit pendulum fortune and prophecy" },
-      { command: "prayer", description: "Recite supplication to The Fool" },
-      { command: "ritual", description: "Convoke interactive Grey Fog ceremony" },
-      { command: "leaderboard", description: "Top Beyonders by Sequence & XP" },
-      { command: "status", description: "Inspect Beyonder dossier & Sequence progress" },
-      // Governance & Community
-      { command: "suggest", description: "Submit feature proposal to Council" },
-      { command: "idea", description: "Propose events or community initiatives" },
-      { command: "report", description: "Report bugs or anomalies to Council" },
-      { command: "vote", description: "Participate in or create deliberations" },
-      { command: "suggestions", description: "View approved development ledger" },
-      // Authority & Moderation
-      { command: "council", description: "Tarot Club executive hierarchy" },
-      { command: "celestial_worthy", description: "Supreme Owner dossier and awakening" },
-      { command: "ascend", description: "Promote Beyonder to council seat" },
-      { command: "degrade", description: "Demote council member to Beyonder" },
-      { command: "banish", description: "Permanently ban corrupt entity" },
-      { command: "exile", description: "Expel entity from sanctuary" },
-      { command: "silence", description: "Mute voice in the Grey Fog" },
-      { command: "release", description: "Lift silence from Beyonder" },
-      { command: "seal", description: "Seal sanctuary from regular speech" },
-      { command: "unseal", description: "Lift divine silence from chat" },
-      { command: "erase", description: "Purge heretical blasphemy and messages" },
-      { command: "corrupt", description: "Inflict mark of spiritual corruption (warn)" },
-      { command: "purify", description: "Cleanse 1 mark of corruption" },
-      { command: "corruption", description: "Inspect active corruption marks" },
-      { command: "cleanse", description: "Wipe all corruption marks clean" },
-      { command: "whisper", description: "Bind Grey Fog keyword or sticker filter" },
-      { command: "dispel", description: "Remove an active Grey Fog whisper" },
-      { command: "whispers", description: "List bound keyword triggers in sanctuary" },
-      { command: "ward", description: "Toggle Spiritual Ward anti-link barrier" },
-      { command: "bestow", description: "Grant or clear custom honorific position" },
-    ]);
-    console.log("[Bot] Complete command menu synchronized with Telegram.");
+    await bot.api.setMyCommands(memberCommands);
+    await bot.api.setMyCommands(memberCommands, {
+      scope: { type: "all_group_chats" },
+    });
+    await bot.api.setMyCommands([...adminCommands, ...memberCommands], {
+      scope: { type: "all_chat_administrators" },
+    });
+    console.log("[Bot] Role-scoped command menus synchronized with Telegram.");
   } catch (err: any) {
     console.warn("[Bot] Note: Telegram command menu setup:", err?.message);
   }

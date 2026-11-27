@@ -11,7 +11,7 @@ export async function prayerCommand(ctx: MyContext): Promise<void> {
   const cd = cooldownManager.checkCooldown(`prayer:${from.id}`, 30, ctx.memberRole);
   if (!cd.allowed) {
     await ctx.reply(
-      `𓆩 The spirit world whispers in silence. Wait <b>${cd.remainingSeconds}s</b> before sending another prayer above the Grey Fog. 𓆪`,
+      `𓆩 Desperate much? The spirit world is ignoring your pathetic groveling for <b>${cd.remainingSeconds}s</b>. Take a breath. 𓆪`,
       { parse_mode: "HTML" }
     );
     return;
@@ -37,8 +37,8 @@ export async function prayerCommand(ctx: MyContext): Promise<void> {
     `<i>The King of Yellow and Black who wields good luck."</i>`,
     petitionBlock,
     formatDivider(),
-    `🕯 <b>Spiritual Devotion Count:</b> <code>${totalPrayers}</code> prayers inscribed`,
-    `<i>"Your whispers echo across the spirit world, enveloped in the protective fog."</i>`,
+    `🕯 <b>Spiritual Devotion Count:</b> <code>${totalPrayers}</code> prayers inscribed (+25 XP)`,
+    `<i>"Your whispers barely reached the outer mist, but at least you earned a pity crumb of XP."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

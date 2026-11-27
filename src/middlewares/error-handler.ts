@@ -8,7 +8,7 @@ export async function errorHandler(err: BotError<MyContext>): Promise<void> {
   try {
     if (ctx.chat) {
       await ctx.reply(
-        "𓆩 <i>A tremor ripples through the spirit world. The divine order remains intact, but the incantation failed.</i> 𓆪",
+        "𓆩 <i>The cosmos just cringed at whatever broken nonsense you tried to invoke. The Grey Fog remains unbothered, but your incantation imploded.</i> 𓆪",
         { parse_mode: "HTML" }
       );
     }

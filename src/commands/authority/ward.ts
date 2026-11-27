@@ -44,8 +44,8 @@ export async function wardCommand(ctx: MyContext): Promise<void> {
     await ctx.reply(
       [
         formatHeader("Spiritual Ward Raised"),
-        `🛡 An invisible barrier of Grey Fog now surrounds this sanctuary.`,
-        `<i>Unauthorized external links and invites sent by non-Council Beyonders will be erased immediately.</i>`,
+        `🛡 The Spiritual Ward is now <b>ACTIVE</b>. Any desperate Sequence 9 peasant dropping unauthorized links will have their garbage deleted on sight.`,
+        `<i>Spam elsewhere—this sanctuary isn't your personal billboard.</i>`,
       ].join("\n"),
       { parse_mode: "HTML" }
     );

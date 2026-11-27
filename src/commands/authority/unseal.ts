@@ -46,10 +46,10 @@ export async function unsealCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("The Sanctuary is Unsealed"),
-    `The thick fog recedes to the periphery. The sanctuary whispers are restored to all Beyonders.`,
+    `The fog has lifted. Unwashed mortals may resume typing again—try to keep the collective IQ above room temperature.`,
     `\n<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>The gathering may proceed in accordance with the Sacred Laws.</i>`,
+    `<i>Break the Sacred Laws and you'll be silenced before you finish your sentence.</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

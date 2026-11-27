@@ -9,7 +9,7 @@ export async function groupOnlyGuard(ctx: MyContext, next: NextFunction): Promis
   const chat = ctx.chat;
   if (!chat || (chat.type !== "group" && chat.type !== "supergroup")) {
     await ctx.reply(
-      "𓆩 This sacred rite may only be conducted within the sanctuary of the Tarot Club group. 𓆪",
+      "𓆩 Why are you whispering in private DMs like a cornered rat? Take this rite back into a proper Tarot Club sanctuary group. 𓆪",
       { parse_mode: "HTML" }
     );
     return;

@@ -47,6 +47,13 @@ export async function statusCommand(ctx: MyContext): Promise<void> {
       ? `<b>Spirituality XP:</b> <code>${xp} / ${progress.nextThreshold}</code> (${progress.percent}% toward Seq ${progress.nextLevel})\n<code>[${progress.progressBar}]</code>`
       : `<b>Spirituality XP:</b> <code>${xp}</code> (Apex of Sequence 0)\n<code>[${progress.progressBar}]</code>`;
 
+  const roastFooter =
+    seqLevel >= 8
+      ? `<i>"Still stuck in the Low-Sequence mud? At this pace, Sequence 0 is a fairytale."</i>`
+      : seqLevel >= 5
+      ? `<i>"Mid-Sequence? Cute. Still nowhere near surviving an Angel's sneeze."</i>`
+      : `<i>"Respectable Sequence—for a mortal clawing at the Grey Fog."</i>`;
+
   const response = [
     formatHeader("Beyonder Spiritual Dossier"),
     `<b>Identity:</b> ${formatUserMention(targetId, targetName, targetUsername)} (<code>${targetId}</code>)`,
@@ -60,7 +67,7 @@ export async function statusCommand(ctx: MyContext): Promise<void> {
     `💬 <b>Messages Inscribed:</b> <code>${member?.messages_count ?? 0}</code>`,
     `☠️ <b>Corruption Marks:</b> <code>[${corruptions.length}/${wardConfig.warn_limit}]</code>`,
     formatDivider(),
-    `<i>"Act according to your Sequence name to digest the potion."</i>`,
+    roastFooter,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

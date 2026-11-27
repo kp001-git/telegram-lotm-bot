@@ -11,7 +11,7 @@ export async function fateCommand(ctx: MyContext): Promise<void> {
   const cd = cooldownManager.checkCooldown(`fate:${from.id}`, 30, ctx.memberRole);
   if (!cd.allowed) {
     await ctx.reply(
-      `𓆩 The spirit pendulum is still stabilizing. Wait <b>${cd.remainingSeconds}s</b> before inverting fate once more. 𓆪`,
+      `𓆩 Stop spamming the pendulum like an anxious gambling addict. Your fragile spirit needs <b>${cd.remainingSeconds}s</b> to recover. 𓆪`,
       { parse_mode: "HTML" }
     );
     return;
@@ -37,7 +37,7 @@ export async function fateCommand(ctx: MyContext): Promise<void> {
     formatDivider(),
     `🔮 <b>Prophecy:</b>\n<i>${escapeHtml(omen.prophecy)}</i>`,
     formatDivider(),
-    `<i>"Hold the topaz pendulum steady. Accept what the spirit world reveals."</i>`,
+    `<i>"Don't blame the pendulum if your luck is as tragic as your Sequence rank."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

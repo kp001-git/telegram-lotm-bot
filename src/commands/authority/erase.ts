@@ -11,7 +11,7 @@ export async function eraseCommand(ctx: MyContext): Promise<void> {
   const replyTo = message.reply_to_message;
   if (!replyTo) {
     await ctx.reply(
-      "𓆩 Reply to a message to begin the ritual of erasure. 𓆪",
+      "𓆩 Reply to the actual garbage message you want me to delete. Clicking /erase into the void accomplishes nothing. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
@@ -60,7 +60,7 @@ export async function eraseCommand(ctx: MyContext): Promise<void> {
   // 4. Send brief confirmation that auto-deletes after 4 seconds
   try {
     const confirm = await ctx.reply(
-      `${formatHeader("Divine Erasure")}\n<i>${deletedCount} heretical whisper(s) dissolved into the Grey Fog.</i>`,
+      `${formatHeader("Divine Erasure")}\n<i>${deletedCount} embarrassing message(s) wiped from existence. You're welcome.</i>`,
       { parse_mode: "HTML" }
     );
 

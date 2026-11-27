@@ -12,7 +12,7 @@ export async function silenceCommand(ctx: MyContext): Promise<void> {
 
   if (!target) {
     await ctx.reply(
-      "𓆩 Specify a Beyonder via reply, User ID, or @username to envelop in silence. 𓆪",
+      "𓆩 Reply to a loudmouth, pass their User ID, or type @username. Mind-reading isn't part of my job description. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
@@ -30,7 +30,7 @@ export async function silenceCommand(ctx: MyContext): Promise<void> {
   }
 
   if (!reason) {
-    reason = "Disturbing the stillness above the Grey Fog";
+    reason = "Running their mouth without a single coherent thought";
   }
 
   const currentTargetRole = await resolveUserRole(ctx, target.userId);

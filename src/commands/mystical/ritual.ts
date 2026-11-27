@@ -33,7 +33,7 @@ export async function ritualCommand(ctx: MyContext): Promise<void> {
     const minutes = Math.floor(cd.remainingSeconds / 60);
     const seconds = cd.remainingSeconds % 60;
     await ctx.reply(
-      `𓆩 The ambient spirituality is recovering from the prior rite. Wait <b>${minutes}m ${seconds}s</b> before invoking another ritual. 𓆪`,
+      `𓆩 Calm down, ritual addict. The fog is still cleaning up after your last mess—wait <b>${minutes}m ${seconds}s</b>. 𓆪`,
       { parse_mode: "HTML" }
     );
     return;

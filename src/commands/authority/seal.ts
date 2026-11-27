@@ -50,11 +50,11 @@ export async function sealCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("The Sanctuary is Sealed"),
-    `The ancient Grey Fog descends and envelops the hall. Only high-sequence members of the Tarot Club Council may speak.`,
+    `The ancient Grey Fog just slammed the door on mortal chatter. Only the Council may speak—the rest of you sit there in silence and reflect on your life choices.`,
     `\n<b>Decree:</b> ${escapeHtml(reason)}`,
     `<b>Sealed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>"Maintain reverence in the presence of the deities."</i>`,
+    `<i>"Enjoy the quiet. Nobody missed your commentary anyway."</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

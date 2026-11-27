@@ -80,7 +80,7 @@ export function registerCorruptionCallbacks(bot: Bot<MyContext>): void {
       role !== "THE_STAR"
     ) {
       await ctx.answerCallbackQuery({
-        text: "𓆩 Only High-Sequence Council members may purify corruption marks. 𓆪",
+        text: "𓆩 Nice try, Sequence 9. Only the Council touches this seal. 𓆪",
         show_alert: true,
       });
       return;

@@ -140,7 +140,7 @@ export async function chatDefenseMiddleware(ctx: MyContext, next: NextFunction):
 
           try {
             const warnMsg = await ctx.reply(
-              `🛡 ${formatUserMention(from.id, from.first_name, from.username)}, the <b>Spiritual Ward</b> forbids unauthorized external links in this sanctuary.`,
+              `🛡 ${formatUserMention(from.id, from.first_name, from.username)}, did your two remaining brain cells really think nobody would notice that desperate link spam? The <b>Spiritual Ward</b> just incinerated your trash.`,
               { parse_mode: "HTML" }
             );
             setTimeout(async () => {

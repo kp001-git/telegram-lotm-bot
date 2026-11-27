@@ -12,7 +12,7 @@ export async function releaseCommand(ctx: MyContext): Promise<void> {
 
   if (!target) {
     await ctx.reply(
-      "𓆩 Specify a Beyonder via reply, User ID, or @username to release from silence. 𓆪",
+      "𓆩 Specify who you're unmuting via reply, User ID, or @username. Reading comprehension is free, use it. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
@@ -65,10 +65,10 @@ export async function releaseCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Curse Lifted"),
-    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has been released from the shroud of silence.`,
-    `\n<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has been allowed to speak again. Try not to immediately waste everyone's oxygen.`,
+    `\n<b>Mercy by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>The power of speech is restored within the sanctuary.</i>`,
+    `<i>One more bad take and the muzzle goes right back on.</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

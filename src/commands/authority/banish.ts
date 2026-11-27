@@ -12,13 +12,13 @@ export async function banishCommand(ctx: MyContext): Promise<void> {
 
   if (!target) {
     await ctx.reply(
-      "𓆩 Specify a Beyonder via reply, User ID, or @username to enact eternal banishment. 𓆪",
+      "𓆩 Who am I supposed to vaporize, genius? Reply to a message, pass a User ID, or type @username. Basic literacy isn't optional. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
   }
 
-  const reason = rawReason.trim() || "Corruption and violation of sacred decrees";
+  const reason = rawReason.trim() || "Being an insufferable waste of spirituality";
 
   const currentTargetRole = await resolveUserRole(ctx, target.userId);
   const botInfo = ctx.me;
@@ -55,11 +55,11 @@ export async function banishCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Eternal Banishment"),
-    `${formatUserMention(target.userId, target.firstName || "Corrupt Entity", target.username)} has been severed from the sanctuary of the Grey Fog.`,
-    `\n<b>Reason:</b> ${escapeHtml(reason)}`,
-    `<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+    `${formatUserMention(target.userId, target.firstName || "Corrupt Entity", target.username)} has been permanently yeeted into the abyss above the Grey Fog. Good riddance.`,
+    `\n<b>Crime:</b> ${escapeHtml(reason)}`,
+    `<b>Executed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>Their spiritual thread in this domain is severed permanently.</i>`,
+    `<i>Nothing of value was lost today.</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

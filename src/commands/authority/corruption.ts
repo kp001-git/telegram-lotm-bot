@@ -40,9 +40,9 @@ export async function corruptionCommand(ctx: MyContext): Promise<void> {
   if (records.length === 0) {
     const cleanMsg = [
       formatHeader("Spirit Body Inspection"),
-      `🕯 ${formatUserMention(targetId, targetName, targetUsername)} bears <code>[0/${warnLimit}]</code> corruption marks.`,
+      `🕯 ${formatUserMention(targetId, targetName, targetUsername)} has <code>[0/${warnLimit}]</code> corruption marks. Shockingly clean—either you actually behave or you just lurk in silence.`,
       formatDivider(),
-      `<i>Their spirit body remains pure and unblemished.</i>`,
+      `<i>Don't get cocky. One dumb move and that changes fast.</i>`,
     ].join("\n");
 
     await ctx.reply(cleanMsg, { parse_mode: "HTML" });

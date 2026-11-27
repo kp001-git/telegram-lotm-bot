@@ -41,11 +41,11 @@ export async function leaderboardCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Sanctuary Sequence Leaderboard"),
-    `<i>The highest-ranking Beyonders of ${escapeHtml(chat.title || "this sanctuary")}:</i>`,
+    `<i>The only 10 Beyonders in ${escapeHtml(chat.title || "this sanctuary")} actually pulling their weight:</i>`,
     formatDivider(),
     lines.join("\n\n"),
     formatDivider(),
-    `<i>Gain Spirituality XP via active presence, /prayer (+25 XP), and /ritual (+40 XP).</i>`,
+    `<i>Not on the list? Stop lurking and grind XP via active presence, /prayer (+25 XP), or /ritual (+40 XP).</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

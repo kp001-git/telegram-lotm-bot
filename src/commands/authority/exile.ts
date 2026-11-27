@@ -12,13 +12,13 @@ export async function exileCommand(ctx: MyContext): Promise<void> {
 
   if (!target) {
     await ctx.reply(
-      "𓆩 Specify a Beyonder via reply, User ID, or @username to enact divine exile. 𓆪",
+      "𓆩 Tag someone, reply to their trash, or give me a User ID. I can't exile thin air. 𓆪",
       { parse_mode: "HTML" }
     );
     return;
   }
 
-  const reason = rawReason.trim() || "Expelled beyond the boundaries of the sanctuary";
+  const reason = rawReason.trim() || "Stinking up the sanctuary with terminal mediocrity";
 
   const currentTargetRole = await resolveUserRole(ctx, target.userId);
   const botInfo = ctx.me;
@@ -56,11 +56,11 @@ export async function exileCommand(ctx: MyContext): Promise<void> {
 
   const response = [
     formatHeader("Divine Exile"),
-    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has been cast beyond the perimeter of the Grey Fog.`,
-    `\n<b>Reason:</b> ${escapeHtml(reason)}`,
-    `<b>Decree by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
+    `${formatUserMention(target.userId, target.firstName || "Beyonder", target.username)} has been kicked straight out the front door of the Grey Fog.`,
+    `\n<b>Crime:</b> ${escapeHtml(reason)}`,
+    `<b>Executed by:</b> ${formatUserMention(from.id, from.first_name, from.username)}`,
     formatDivider(),
-    `<i>They may return only should an invitation be extended once more.</i>`,
+    `<i>Feel free to stay out. Nobody here was asking for your encore.</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

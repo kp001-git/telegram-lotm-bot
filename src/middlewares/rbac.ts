@@ -105,7 +105,7 @@ export function requireRole(...allowedRoles: BeyonderRole[]) {
     }
 
     const rejectionMessage =
-      "𓆩 The Grey Fog blocks your path. Only High-Sequence Beyonders of the Council may invoke this authority. 𓆪";
+      "𓆩 Know your place, fragile Sequence 9 worm. Even glancing at High-Sequence Council authority will shatter your pathetic spirit body into dust. Stay in the dirt where you belong. 𓆪";
 
     await ctx.reply(rejectionMessage, { parse_mode: "HTML" });
   };

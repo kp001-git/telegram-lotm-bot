@@ -22,7 +22,7 @@ export async function handleSubmission(
 
   if (!content || content.length < 8) {
     await ctx.reply(
-      `𓆩 Provide a detailed description (minimum 8 characters):\n<code>/${commandName} &lt;your description here&gt;</code> 𓆪`,
+      `𓆩 That wasn't a proposal, that was a sneeze. Give me at least 8 characters:\n<code>/${commandName} &lt;your description here&gt;</code> 𓆪`,
       { parse_mode: "HTML" }
     );
     return;
