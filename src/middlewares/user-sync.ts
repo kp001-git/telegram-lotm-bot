@@ -50,9 +50,10 @@ export async function userSyncMiddleware(ctx: MyContext, next: NextFunction): Pr
 
     if (profileChanged || count >= 10) {
       userCache.resetUnsavedMessages(chatId, userId);
+      const xpGain = count >= 10 ? 5 : 0;
       if (chatId) {
         userRepository
-          .upsertMember(chatId, userId, username, firstName, cached.role, count)
+          .upsertMember(chatId, userId, username, firstName, cached.role, count, xpGain)
           .then(async () => {
             const dbMember = await userRepository.getMember(chatId, userId);
             userCache.set(chatId, userId, cached.role, dbMember, firstName, username);

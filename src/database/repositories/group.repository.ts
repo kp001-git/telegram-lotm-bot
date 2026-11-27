@@ -7,12 +7,18 @@ export interface GroupSettings {
   sacred_laws: string | null;
   lore_text: string | null;
   welcome_template: string | null;
+  welcome_enabled?: number;
+  goodbye_enabled?: number;
+  goodbye_template?: string | null;
   is_sealed: number;
   log_chat_id: string | null;
 }
 
 export const DEFAULT_WELCOME_TEMPLATE =
   "𓆩 A SOUL SUMMONED ABOVE THE GREY FOG 𓆪\nWelcome {mention} to {group}.\nYou have crossed the crimson threshold as Beyonder #{count}.\n\nObserve the Sacred Laws, respect the Divine Council, and protect your anchor against madness.";
+
+export const DEFAULT_GOODBYE_TEMPLATE =
+  "𓆩 {name} has stepped down from the Grey Fog and departed {group}. May the Fool watch over their journey. 𓆪";
 
 export function getDefaultLawsText(): string {
   const laws = defaultLaws.map(
@@ -106,6 +112,64 @@ export class GroupRepository {
 
   async setWelcomeTemplate(chatId: number, template: string): Promise<void> {
     await this.upsertSettings(chatId, { welcome_template: template });
+  }
+
+  async getWelcomeConfig(chatId: number): Promise<{ enabled: boolean; template: string }> {
+    const settings = await this.getSettings(chatId);
+    const enabled = settings ? (settings.welcome_enabled ?? 1) === 1 : true;
+    const template =
+      settings && settings.welcome_template && settings.welcome_template.trim().length > 0
+        ? settings.welcome_template
+        : DEFAULT_WELCOME_TEMPLATE;
+    return { enabled, template };
+  }
+
+  async setWelcomeEnabled(chatId: number, enabled: boolean): Promise<void> {
+    const val = enabled ? 1 : 0;
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, welcome_enabled)
+        VALUES (?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          welcome_enabled = excluded.welcome_enabled;
+      `,
+      args: [chatId, val],
+    });
+  }
+
+  async getGoodbyeConfig(chatId: number): Promise<{ enabled: boolean; template: string }> {
+    const settings = await this.getSettings(chatId);
+    const enabled = settings ? (settings.goodbye_enabled ?? 1) === 1 : true;
+    const template =
+      settings && settings.goodbye_template && settings.goodbye_template.trim().length > 0
+        ? settings.goodbye_template
+        : DEFAULT_GOODBYE_TEMPLATE;
+    return { enabled, template };
+  }
+
+  async setGoodbyeTemplate(chatId: number, template: string): Promise<void> {
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, goodbye_template)
+        VALUES (?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          goodbye_template = excluded.goodbye_template;
+      `,
+      args: [chatId, template],
+    });
+  }
+
+  async setGoodbyeEnabled(chatId: number, enabled: boolean): Promise<void> {
+    const val = enabled ? 1 : 0;
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, goodbye_enabled)
+        VALUES (?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          goodbye_enabled = excluded.goodbye_enabled;
+      `,
+      args: [chatId, val],
+    });
   }
 
   async isChatSealed(chatId: number): Promise<boolean> {

@@ -35,11 +35,41 @@ export async function summoningCommand(ctx: MyContext): Promise<void> {
   const text = ctx.message?.text || "";
   const parts = text.trim().split(/\s+/);
   const action = parts[1]?.toLowerCase();
+  const role = ctx.memberRole || "BEYONDER";
+  const isCouncil =
+    role === "CELESTIAL_WORTHY" ||
+    role === "THE_FOOL" ||
+    role === "THE_WORLD" ||
+    role === "THE_STAR";
 
-  // 1. Admin Override: /summoning set <template>
+  // 1. Toggle Welcome Gateway: /summoning on | off
+  if (action === "on" || action === "off") {
+    if (!isCouncil) {
+      await ctx.reply(
+        "𓆩 Only High-Sequence Beyonders of the Council may open or seal the summoning gateway. 𓆪",
+        { parse_mode: "HTML" }
+      );
+      return;
+    }
+
+    const enabled = action === "on";
+    await groupRepository.setWelcomeEnabled(chat.id, enabled);
+
+    await ctx.reply(
+      [
+        formatHeader(enabled ? "Summoning Gateway Opened" : "Summoning Gateway Sealed"),
+        enabled
+          ? `✨ Automatic arrival greetings are now <b>ACTIVE</b> for newly summoned Beyonders.`
+          : `⭕ Automatic arrival greetings are now <b>DORMANT</b>.`,
+      ].join("\n"),
+      { parse_mode: "HTML" }
+    );
+    return;
+  }
+
+  // 2. Admin Override: /summoning set <template>
   if (action === "set") {
-    const role = ctx.memberRole || "BEYONDER";
-    if (role !== "CELESTIAL_WORTHY" && role !== "THE_FOOL") {
+    if (!isCouncil) {
       await ctx.reply(
         "𓆩 Only High-Sequence Beyonders of the Council may formulate summoning incantations. 𓆪",
         { parse_mode: "HTML" }
@@ -73,8 +103,8 @@ export async function summoningCommand(ctx: MyContext): Promise<void> {
     return;
   }
 
-  // 2. Preview Summoning Welcome: /summoning or /summoning test
-  const template = await groupRepository.getWelcomeTemplate(chat.id);
+  // 3. Preview Summoning Welcome: /summoning or /summoning test
+  const welcomeConfig = await groupRepository.getWelcomeConfig(chat.id);
   const isSealed = await groupRepository.isChatSealed(chat.id);
   let memberCount = 1;
   try {
@@ -85,17 +115,18 @@ export async function summoningCommand(ctx: MyContext): Promise<void> {
 
   const groupTitle = chat.title || "The Tarot Club";
   const preview = renderWelcomeTemplate(
-    template,
+    welcomeConfig.template,
     { id: from.id, firstName: from.first_name, username: from.username },
     groupTitle,
     memberCount,
     isSealed
   );
 
+  const statusText = welcomeConfig.enabled ? "ACTIVE" : "DORMANT";
   const response = [
     preview,
     formatDivider(),
-    `<i>[Summoning Rite Preview — Configurable via /summoning set &lt;text&gt;]</i>`,
+    `<i>[Summoning Gateway: <b>${statusText}</b> — /summoning on|off | /summoning set &lt;text&gt;]</i>`,
   ].join("\n");
 
   await ctx.reply(response, { parse_mode: "HTML" });

@@ -1,4 +1,5 @@
 import { getDatabaseClient } from "../client";
+import { calculateSequenceLevel } from "../../utils/sequences";
 
 export type BeyonderRole =
   | "CELESTIAL_WORTHY"
@@ -15,6 +16,8 @@ export interface DbUser {
   role: BeyonderRole;
   pathway: string | null;
   sequence_level: number;
+  spirituality_xp?: number;
+  custom_position?: string | null;
   prayers_count: number;
   messages_count: number;
   joined_at: string;
@@ -70,40 +73,75 @@ export class UserRepository {
     username: string | null,
     firstName: string,
     initialRole: BeyonderRole = "BEYONDER",
-    incrementBy: number = 1
+    incrementBy: number = 1,
+    xpGain: number = 0
   ): Promise<void> {
     const now = new Date().toISOString();
-    await this.client.batch(
-      [
-        {
-          sql: `
-            INSERT INTO group_members (
-              chat_id, user_id, username, first_name, role, pathway, sequence_level, prayers_count, messages_count, joined_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, NULL, 9, 0, ?, ?, ?)
-            ON CONFLICT(chat_id, user_id) DO UPDATE SET
-              username = excluded.username,
-              first_name = excluded.first_name,
-              messages_count = group_members.messages_count + ?,
-              updated_at = excluded.updated_at;
-          `,
-          args: [chatId, userId, username, firstName, initialRole, incrementBy, now, now, incrementBy],
-        },
-        {
-          sql: `
-            INSERT INTO users (
-              user_id, username, first_name, role, pathway, sequence_level, prayers_count, messages_count, joined_at, updated_at
-            ) VALUES (?, ?, ?, ?, NULL, 9, 0, ?, ?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET
-              username = excluded.username,
-              first_name = excluded.first_name,
-              messages_count = users.messages_count + ?,
-              updated_at = excluded.updated_at;
-          `,
-          args: [userId, username, firstName, initialRole, incrementBy, now, now, incrementBy],
-        },
-      ],
-      "write"
-    );
+    const initialSeq = calculateSequenceLevel(xpGain);
+    const statements: any[] = [
+      {
+        sql: `
+          INSERT INTO group_members (
+            chat_id, user_id, username, first_name, role, pathway, sequence_level, spirituality_xp, prayers_count, messages_count, joined_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, NULL, ?, ?, 0, ?, ?, ?)
+          ON CONFLICT(chat_id, user_id) DO UPDATE SET
+            username = excluded.username,
+            first_name = excluded.first_name,
+            messages_count = group_members.messages_count + ?,
+            spirituality_xp = COALESCE(group_members.spirituality_xp, 0) + ?,
+            sequence_level = CASE
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 9000 THEN 0
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 6000 THEN 1
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 4200 THEN 2
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 2800 THEN 3
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 1800 THEN 4
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 1100 THEN 5
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 600 THEN 6
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 300 THEN 7
+              WHEN COALESCE(group_members.spirituality_xp, 0) + ? >= 100 THEN 8
+              ELSE 9
+            END,
+            updated_at = excluded.updated_at;
+        `,
+        args: [
+          chatId,
+          userId,
+          username,
+          firstName,
+          initialRole,
+          initialSeq,
+          xpGain,
+          incrementBy,
+          now,
+          now,
+          incrementBy,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+        ],
+      },
+      {
+        sql: `
+          INSERT INTO users (
+            user_id, username, first_name, role, pathway, sequence_level, prayers_count, messages_count, joined_at, updated_at
+          ) VALUES (?, ?, ?, ?, NULL, 9, 0, ?, ?, ?)
+          ON CONFLICT(user_id) DO UPDATE SET
+            username = excluded.username,
+            first_name = excluded.first_name,
+            messages_count = users.messages_count + ?,
+            updated_at = excluded.updated_at;
+        `,
+        args: [userId, username, firstName, initialRole, incrementBy, now, now, incrementBy],
+      },
+    ];
+    await this.client.batch(statements, "write");
   }
 
   async getMember(chatId: number, userId: number): Promise<DbUser | null> {
@@ -206,7 +244,7 @@ export class UserRepository {
     await this.client.batch(statements, "write");
   }
 
-  async incrementPrayers(userId: number, chatId?: number): Promise<number> {
+  async incrementPrayers(userId: number, chatId?: number, xpGain: number = 0): Promise<number> {
     const now = new Date().toISOString();
     let newCount = 1;
 
@@ -214,11 +252,40 @@ export class UserRepository {
       const res = await this.client.execute({
         sql: `
           UPDATE group_members 
-          SET prayers_count = prayers_count + 1, updated_at = ? 
+          SET 
+            prayers_count = prayers_count + 1,
+            spirituality_xp = COALESCE(spirituality_xp, 0) + ?,
+            sequence_level = CASE
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 9000 THEN 0
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 6000 THEN 1
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 4200 THEN 2
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 2800 THEN 3
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 1800 THEN 4
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 1100 THEN 5
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 600 THEN 6
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 300 THEN 7
+              WHEN COALESCE(spirituality_xp, 0) + ? >= 100 THEN 8
+              ELSE 9
+            END,
+            updated_at = ? 
           WHERE chat_id = ? AND user_id = ?
           RETURNING prayers_count;
         `,
-        args: [now, chatId, userId],
+        args: [
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          xpGain,
+          now,
+          chatId,
+          userId,
+        ],
       });
       if (res.rows.length > 0) {
         newCount = Number(res.rows[0].prayers_count);
@@ -241,6 +308,35 @@ export class UserRepository {
     }
 
     return newCount;
+  }
+
+  async getGroupLeaderboard(chatId: number, limit = 10): Promise<DbUser[]> {
+    const res = await this.client.execute({
+      sql: `
+        SELECT * FROM group_members
+        WHERE chat_id = ?
+        ORDER BY sequence_level ASC, COALESCE(spirituality_xp, 0) DESC, messages_count DESC
+        LIMIT ?;
+      `,
+      args: [chatId, limit],
+    });
+
+    return res.rows as unknown as DbUser[];
+  }
+
+  async setMemberPosition(chatId: number, userId: number, position: string | null): Promise<void> {
+    const now = new Date().toISOString();
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_members (
+          chat_id, user_id, username, first_name, role, pathway, sequence_level, spirituality_xp, custom_position, prayers_count, messages_count, joined_at, updated_at
+        ) VALUES (?, ?, NULL, 'Beyonder', 'BEYONDER', NULL, 9, 0, ?, 0, 0, ?, ?)
+        ON CONFLICT(chat_id, user_id) DO UPDATE SET
+          custom_position = excluded.custom_position,
+          updated_at = excluded.updated_at;
+      `,
+      args: [chatId, userId, position, now, now],
+    });
   }
 
   async getCouncilMembers(chatId?: number): Promise<DbUser[]> {

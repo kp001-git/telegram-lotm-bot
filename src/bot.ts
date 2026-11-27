@@ -116,7 +116,8 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
       { command: "sacred_laws", description: "View or set Tarot Club sacred decrees" },
       { command: "mysteries", description: "Live overview of sanctuary domain" },
       { command: "fate_records", description: "Activity ledger and top Beyonders" },
-      { command: "summoning", description: "Preview or set welcoming rites" },
+      { command: "summoning", description: "Preview, toggle, or set welcoming rites" },
+      { command: "farewell", description: "Preview, toggle, or set departure rites" },
       { command: "lore", description: "Chronicles and ethos of Grey Fog" },
       // Mystical & Lore
       { command: "pathway", description: "Inquire or choose from 22 pathways" },
@@ -126,6 +127,8 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
       { command: "fate", description: "Spirit pendulum fortune and prophecy" },
       { command: "prayer", description: "Recite supplication to The Fool" },
       { command: "ritual", description: "Convoke interactive Grey Fog ceremony" },
+      { command: "leaderboard", description: "Top Beyonders by Sequence & XP" },
+      { command: "status", description: "Inspect Beyonder dossier & Sequence progress" },
       // Governance & Community
       { command: "suggest", description: "Submit feature proposal to Council" },
       { command: "idea", description: "Propose events or community initiatives" },
@@ -152,6 +155,7 @@ export async function setupBotCommands(bot: Bot<MyContext>): Promise<void> {
       { command: "dispel", description: "Remove an active Grey Fog whisper" },
       { command: "whispers", description: "List bound keyword triggers in sanctuary" },
       { command: "ward", description: "Toggle Spiritual Ward anti-link barrier" },
+      { command: "bestow", description: "Grant or clear custom honorific position" },
     ]);
     console.log("[Bot] Complete command menu synchronized with Telegram.");
   } catch (err: any) {

@@ -21,8 +21,8 @@ export async function prayerCommand(ctx: MyContext): Promise<void> {
   const parts = text.trim().split(/\s+/);
   const petition = parts.slice(1).join(" ").trim();
 
-  // Increment prayers count in Turso
-  const totalPrayers = await userRepository.incrementPrayers(from.id, ctx.chat?.id);
+  // Increment prayers count and award +25 Spirituality XP in Turso
+  const totalPrayers = await userRepository.incrementPrayers(from.id, ctx.chat?.id, 25);
 
   const petitionBlock = petition
     ? `\n<b>Petitioner's Whisper:</b>\n<i>"${escapeHtml(petition)}"</i>\n`

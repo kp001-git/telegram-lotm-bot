@@ -8,6 +8,8 @@ import { tarotCommand } from "./tarot";
 import { fateCommand } from "./fate";
 import { prayerCommand } from "./prayer";
 import { ritualCommand, activeRituals } from "./ritual";
+import { leaderboardCommand } from "./leaderboard";
+import { statusCommand } from "./status";
 import { userRepository } from "../../database/repositories/user.repository";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -18,6 +20,8 @@ export * from "./tarot";
 export * from "./fate";
 export * from "./prayer";
 export * from "./ritual";
+export * from "./leaderboard";
+export * from "./status";
 
 export function registerMysticalCommands(bot: Bot<MyContext>): void {
   // Lore & Pathways
@@ -30,6 +34,10 @@ export function registerMysticalCommands(bot: Bot<MyContext>): void {
   bot.command("fate", fateCommand);
   bot.command("prayer", prayerCommand);
   bot.command("ritual", groupOnlyGuard, ritualCommand);
+
+  // Progression & Dossier
+  bot.command("leaderboard", groupOnlyGuard, leaderboardCommand);
+  bot.command(["status", "beyonder"], groupOnlyGuard, statusCommand);
 
   // Interactive Ritual Channeling Callback: ritual:channel:<sessionId>
   bot.callbackQuery(/^ritual:channel:(.+)$/, async (ctx) => {
@@ -61,9 +69,9 @@ export function registerMysticalCommands(bot: Bot<MyContext>): void {
       return;
     }
 
-    // Add participant & increment devotion in Turso
+    // Add participant & increment devotion (+40 Spirituality XP) in Turso
     session.participants.set(from.id, from.first_name);
-    await userRepository.incrementPrayers(from.id, ctx.chat?.id);
+    await userRepository.incrementPrayers(from.id, ctx.chat?.id, 40);
 
     const count = session.participants.size;
     const isCompleted = count >= session.maxParticipants;

@@ -16,6 +16,12 @@ import { UNAUTHORIZED_GROUP_MESSAGE } from "../src/middlewares/guard";
 import { defenseRepository } from "../src/database/repositories/defense.repository";
 import { containsUnauthorizedLink, findMatchingWhisper } from "../src/middlewares/chat-defense";
 import { parseTriggerAndRest } from "../src/commands/authority/whisper";
+import {
+  calculateSequenceLevel,
+  getSequenceTitle,
+  getSequenceTierLabel,
+} from "../src/utils/sequences";
+import { renderFarewellTemplate } from "../src/commands/board/farewell";
 import pathwaysData from "../src/data/pathways.json";
 import tarotData from "../src/data/tarot_cards.json";
 import mysticalEvents from "../src/data/mystical_events.json";
@@ -601,7 +607,87 @@ async function runTests() {
   await defenseRepository.setWardEnabled(corruptChatId, false);
   console.log("✔ Phase B Spiritual Ward anti-link detection & whitelisting verified.");
 
-  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A & Phase B Verification Tests Passed Flawlessly! 𓆪\n");
+  // 29. Phase C: Sequence XP Threshold Calculation & Canonical Pathway Title Lookup
+  if (
+    calculateSequenceLevel(0) !== 9 ||
+    calculateSequenceLevel(99) !== 9 ||
+    calculateSequenceLevel(100) !== 8 ||
+    calculateSequenceLevel(300) !== 7 ||
+    calculateSequenceLevel(600) !== 6 ||
+    calculateSequenceLevel(1100) !== 5 ||
+    calculateSequenceLevel(1800) !== 4 ||
+    calculateSequenceLevel(2800) !== 3 ||
+    calculateSequenceLevel(4200) !== 2 ||
+    calculateSequenceLevel(6000) !== 1 ||
+    calculateSequenceLevel(9000) !== 0
+  ) {
+    throw new Error("Sequence XP threshold calculation failed");
+  }
+
+  const foolSeq8 = getSequenceTitle("Fool", 8);
+  const unalignedSeq7 = getSequenceTitle(null, 7);
+  if (foolSeq8 !== "Sequence 8: Clown" || unalignedSeq7 !== "Sequence 7 Beyonder") {
+    throw new Error(`Sequence title lookup failed: ${foolSeq8} | ${unalignedSeq7}`);
+  }
+  if (
+    getSequenceTierLabel(0) !== "True Deity" ||
+    getSequenceTierLabel(2) !== "Angel" ||
+    getSequenceTierLabel(4) !== "Saint / Demigod" ||
+    getSequenceTierLabel(6) !== "Mid-Sequence" ||
+    getSequenceTierLabel(9) !== "Low-Sequence"
+  ) {
+    throw new Error("Sequence tier label mapping failed");
+  }
+  console.log("✔ Phase C Sequence XP thresholds (Seq 9 -> Seq 0) & canonical title lookup verified.");
+
+  // 30. Phase C: Per-Group Leaderboard Ordering & Custom Position Assignment
+  const lbChatId = -100111111;
+  await userRepository.upsertMember(lbChatId, 8880001, "leonard_mitchell", "Leonard", "THE_STAR", 5, 120);
+  await userRepository.upsertMember(lbChatId, 8880002, "alger_wilson", "Alger", "THE_WORLD", 10, 450);
+  await userRepository.setMemberPosition(lbChatId, 8880002, "Tarot Envoy");
+
+  const leaderboard = await userRepository.getGroupLeaderboard(lbChatId, 10);
+  if (
+    leaderboard.length < 2 ||
+    leaderboard[0].user_id !== 8880002 ||
+    leaderboard[0].sequence_level !== 7 ||
+    leaderboard[0].custom_position !== "Tarot Envoy"
+  ) {
+    throw new Error(`Group leaderboard / custom position failed: ${JSON.stringify(leaderboard)}`);
+  }
+
+  await userRepository.setMemberPosition(lbChatId, 8880002, null);
+  const clearedMember = await userRepository.getMember(lbChatId, 8880002);
+  if (clearedMember?.custom_position !== null) {
+    throw new Error("Failed to clear custom_position");
+  }
+  console.log("✔ Phase C Per-group leaderboard ordering & custom position assignment verified.");
+
+  // 31. Phase C: Welcome & Goodbye Gateway Toggles & Template Persistence
+  await groupRepository.setWelcomeEnabled(lbChatId, false);
+  const welcomeOff = await groupRepository.getWelcomeConfig(lbChatId);
+  await groupRepository.setWelcomeEnabled(lbChatId, true);
+  const welcomeOn = await groupRepository.getWelcomeConfig(lbChatId);
+
+  if (welcomeOff.enabled !== false || welcomeOn.enabled !== true) {
+    throw new Error("Welcome gateway toggle persistence failed");
+  }
+
+  await groupRepository.setGoodbyeEnabled(lbChatId, true);
+  await groupRepository.setGoodbyeTemplate(lbChatId, "Farewell {name} from {group} ({count} remain).");
+  const goodbyeCfg = await groupRepository.getGoodbyeConfig(lbChatId);
+  const renderedFarewell = renderFarewellTemplate(
+    goodbyeCfg.template,
+    { id: 8880001, firstName: "Leonard", username: "leonard_mitchell" },
+    "Tarot Club",
+    42
+  );
+  if (!goodbyeCfg.enabled || !renderedFarewell.includes("Farewell Leonard from Tarot Club (42 remain).")) {
+    throw new Error(`Goodbye gateway persistence/rendering failed: ${renderedFarewell}`);
+  }
+  console.log("✔ Phase C Welcome & Goodbye gateway toggles and template persistence verified.");
+
+  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A, Phase B & Phase C Verification Tests Passed Flawlessly! 𓆪\n");
 }
 
 runTests().catch((err) => {

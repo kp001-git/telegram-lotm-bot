@@ -21,6 +21,7 @@ import { whisperCommand } from "./whisper";
 import { dispelCommand } from "./dispel";
 import { whispersCommand } from "./whispers";
 import { wardCommand } from "./ward";
+import { bestowCommand } from "./bestow";
 
 export * from "./celestial_worthy";
 export * from "./council";
@@ -41,6 +42,7 @@ export * from "./whisper";
 export * from "./dispel";
 export * from "./whispers";
 export * from "./ward";
+export * from "./bestow";
 
 export function registerAuthorityCommands(bot: Bot<MyContext>): void {
   // Foundational Information & Binding
@@ -154,5 +156,13 @@ export function registerAuthorityCommands(bot: Bot<MyContext>): void {
     groupOnlyGuard,
     requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
     wardCommand
+  );
+
+  // Phase C: Bestow Honorific Position
+  bot.command(
+    "bestow",
+    groupOnlyGuard,
+    requireRole("CELESTIAL_WORTHY", "THE_FOOL", "THE_WORLD"),
+    bestowCommand
   );
 }

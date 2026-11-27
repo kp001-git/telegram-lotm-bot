@@ -23,6 +23,8 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       role TEXT DEFAULT 'BEYONDER',
       pathway TEXT,
       sequence_level INTEGER DEFAULT 9,
+      spirituality_xp INTEGER DEFAULT 0,
+      custom_position TEXT,
       prayers_count INTEGER DEFAULT 0,
       messages_count INTEGER DEFAULT 0,
       joined_at TEXT,
@@ -34,6 +36,9 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
       sacred_laws TEXT,
       lore_text TEXT,
       welcome_template TEXT,
+      welcome_enabled INTEGER DEFAULT 1,
+      goodbye_enabled INTEGER DEFAULT 1,
+      goodbye_template TEXT,
       is_sealed INTEGER DEFAULT 0,
       log_chat_id TEXT,
       warn_limit INTEGER DEFAULT 3,
@@ -124,6 +129,11 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
     "ALTER TABLE group_settings ADD COLUMN warn_punishment TEXT DEFAULT 'SILENCE';",
     "ALTER TABLE group_settings ADD COLUMN ward_enabled INTEGER DEFAULT 0;",
     "ALTER TABLE group_settings ADD COLUMN ward_whitelist TEXT DEFAULT 't.me,telegram.org';",
+    "ALTER TABLE group_settings ADD COLUMN welcome_enabled INTEGER DEFAULT 1;",
+    "ALTER TABLE group_settings ADD COLUMN goodbye_enabled INTEGER DEFAULT 1;",
+    "ALTER TABLE group_settings ADD COLUMN goodbye_template TEXT;",
+    "ALTER TABLE group_members ADD COLUMN spirituality_xp INTEGER DEFAULT 0;",
+    "ALTER TABLE group_members ADD COLUMN custom_position TEXT;",
   ];
 
   for (const sql of safeMigrations) {
@@ -134,10 +144,16 @@ export async function initSchema(client: Client = getDatabaseClient()): Promise<
     }
   }
 
-  // Create index on suggestions(chat_id) after column is guaranteed to exist
-  try {
-    await client.execute("CREATE INDEX IF NOT EXISTS idx_suggestions_chat ON suggestions(chat_id);");
-  } catch {
-    // Ignore index creation error
+  // Create indexes on migrated columns after they are guaranteed to exist
+  const postMigrationIndexes = [
+    "CREATE INDEX IF NOT EXISTS idx_suggestions_chat ON suggestions(chat_id);",
+    "CREATE INDEX IF NOT EXISTS idx_group_members_xp ON group_members(chat_id, sequence_level, spirituality_xp);",
+  ];
+  for (const idxSql of postMigrationIndexes) {
+    try {
+      await client.execute(idxSql);
+    } catch {
+      // Ignore index creation error
+    }
   }
 }
