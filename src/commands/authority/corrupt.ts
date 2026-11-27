@@ -1,7 +1,9 @@
 import { InlineKeyboard } from "grammy";
 import { MyContext } from "../../middlewares/context";
 import { defenseRepository } from "../../database/repositories/defense.repository";
+import { userRepository } from "../../database/repositories/user.repository";
 import { auditRepository } from "../../database/repositories/audit.repository";
+import { isShadowSovereign } from "../../config";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole } from "../../utils/resolver";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -22,7 +24,42 @@ export async function corruptCommand(ctx: MyContext): Promise<void> {
 
   const reason = rawReason.trim() || "Existing loudly without common sense";
 
+  // Shadow Sovereign target is untouchable by anyone
+  if (isShadowSovereign(target.userId)) {
+    await ctx.reply("𓆩 The Grey Fog refuses to touch this entity. 𓆪", {
+      parse_mode: "HTML",
+    });
+    return;
+  }
+
   const currentTargetRole = await resolveUserRole(ctx, target.userId);
+
+  // Protect all Council roles and native Telegram group admins/creator (unless actor is Shadow Sovereign)
+  if (!isShadowSovereign(from.id)) {
+    const dbMember = await userRepository.getMember(chat.id, target.userId);
+    const isCouncilTarget =
+      currentTargetRole !== "BEYONDER" ||
+      (dbMember?.role !== undefined && dbMember.role !== "BEYONDER");
+
+    let isNativeAdmin = false;
+    try {
+      const chatMember = await ctx.api.getChatMember(chat.id, target.userId);
+      if (chatMember.status === "administrator" || chatMember.status === "creator") {
+        isNativeAdmin = true;
+      }
+    } catch {
+      // Ignore getChatMember errors if user left or inaccessible
+    }
+
+    if (isCouncilTarget || isNativeAdmin) {
+      await ctx.reply(
+        "𓆩 Did your two remaining brain cells really try to slap a corruption mark on a High-Sequence Admin? Sit down—group administrators and the Council are immune to your pathetic warnings. 𓆪",
+        { parse_mode: "HTML" }
+      );
+      return;
+    }
+  }
+
   const botInfo = ctx.me;
   const check = canActOnTarget(ctx.memberRole, currentTargetRole, from.id, target.userId, botInfo.id);
 

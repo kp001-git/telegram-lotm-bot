@@ -606,8 +606,15 @@ async function runTests() {
   if (isTgAllowed) throw new Error("Ward wrongly blocked whitelisted t.me link");
   if (isYtAllowed) throw new Error("Ward wrongly blocked newly whitelisted youtube.com link");
 
+  // Verify removeWardDomain removes domain and invalidates cache immediately
+  const afterRemove = await defenseRepository.removeWardDomain(corruptChatId, "https://www.youtube.com/watch?v=123");
+  const reloadedAfterRemove = await defenseRepository.getWardConfig(corruptChatId);
+  if (afterRemove.includes("youtube.com") || reloadedAfterRemove.ward_whitelist.includes("youtube.com")) {
+    throw new Error(`removeWardDomain failed to remove youtube.com: ${JSON.stringify(reloadedAfterRemove)}`);
+  }
+
   await defenseRepository.setWardEnabled(corruptChatId, false);
-  console.log("✔ Phase B Spiritual Ward anti-link detection & whitelisting verified.");
+  console.log("✔ Phase B Spiritual Ward anti-link detection, whitelisting & disallowing verified.");
 
   // 29. Phase C: Sequence XP Threshold Calculation & Canonical Pathway Title Lookup
   if (

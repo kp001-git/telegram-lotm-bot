@@ -179,11 +179,21 @@ export class DefenseRepository {
   // =========================================================================
 
   private parseWhitelist(raw?: string | null): string[] {
-    if (!raw || raw.trim().length === 0) return [...DEFAULT_WHITELIST];
+    if (raw === null || raw === undefined) return [...DEFAULT_WHITELIST];
+    if (raw.trim().length === 0) return [];
     return raw
       .split(",")
       .map((d) => d.trim().toLowerCase())
       .filter((d) => d.length > 0);
+  }
+
+  private normalizeDomain(domain: string): string {
+    return domain
+      .trim()
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .split("/")[0];
   }
 
   async getWardConfig(chatId: number): Promise<WardConfig> {
@@ -247,12 +257,7 @@ export class DefenseRepository {
   }
 
   async addWardDomain(chatId: number, domain: string): Promise<string[]> {
-    const cleanDomain = domain
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//, "")
-      .replace(/^www\./, "")
-      .split("/")[0];
+    const cleanDomain = this.normalizeDomain(domain);
 
     if (!cleanDomain) {
       const current = await this.getWardConfig(chatId);
@@ -263,6 +268,31 @@ export class DefenseRepository {
     const updatedSet = new Set(current.ward_whitelist);
     updatedSet.add(cleanDomain);
     const updatedList = Array.from(updatedSet);
+    const joined = updatedList.join(",");
+
+    await this.client.execute({
+      sql: `
+        INSERT INTO group_settings (chat_id, ward_whitelist)
+        VALUES (?, ?)
+        ON CONFLICT(chat_id) DO UPDATE SET
+          ward_whitelist = excluded.ward_whitelist;
+      `,
+      args: [chatId, joined],
+    });
+
+    this.wardConfigCache.delete(chatId);
+    return updatedList;
+  }
+
+  async removeWardDomain(chatId: number, domain: string): Promise<string[]> {
+    const cleanDomain = this.normalizeDomain(domain);
+    const current = await this.getWardConfig(chatId);
+
+    if (!cleanDomain) {
+      return current.ward_whitelist;
+    }
+
+    const updatedList = current.ward_whitelist.filter((d) => d !== cleanDomain);
     const joined = updatedList.join(",");
 
     await this.client.execute({

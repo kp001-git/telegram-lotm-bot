@@ -39,7 +39,7 @@ export async function divinationCommand(ctx: MyContext): Promise<void> {
       ` • <code>/cleanse</code> — Wipe all corruption marks clean`,
       ` • <code>/whisper</code> — Bind Grey Fog keyword/sticker auto-filter`,
       ` • <code>/dispel</code> — Remove an active Grey Fog whisper`,
-      ` • <code>/ward</code> — Toggle Spiritual Ward anti-link barrier`,
+      ` • <code>/ward &lt;on|off|allow|disallow|list&gt;</code> — Manage Spiritual Ward anti-link barrier`,
       ` • <code>/summoning</code> — Preview, toggle, or set welcome rites`,
       ` • <code>/farewell</code> — Preview, toggle, or set departure rites`,
       ""
