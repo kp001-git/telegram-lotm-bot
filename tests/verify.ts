@@ -22,6 +22,8 @@ import {
   getSequenceTierLabel,
 } from "../src/utils/sequences";
 import { renderFarewellTemplate } from "../src/commands/board/farewell";
+import { isShadowSovereign, setShadowSovereignId } from "../src/config";
+import { requireRole } from "../src/middlewares/rbac";
 import pathwaysData from "../src/data/pathways.json";
 import tarotData from "../src/data/tarot_cards.json";
 import mysticalEvents from "../src/data/mystical_events.json";
@@ -687,7 +689,95 @@ async function runTests() {
   }
   console.log("✔ Phase C Welcome & Goodbye gateway toggles and template persistence verified.");
 
-  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A, Phase B & Phase C Verification Tests Passed Flawlessly! 𓆪\n");
+  // 32. Silent Shadow Sovereign Override (Authority, Immunity, Invisibility & Stealth Audit)
+  const shadowTestId = 9990001;
+  const stealthChatId = -100111111;
+  setShadowSovereignId(shadowTestId);
+
+  if (!isShadowSovereign(shadowTestId) || isShadowSovereign(cwId)) {
+    throw new Error("isShadowSovereign check failed");
+  }
+
+  // Supremacy in canActOnTarget (even with public role BEYONDER against CELESTIAL_WORTHY)
+  const shadowOnCw = canActOnTarget("BEYONDER", "CELESTIAL_WORTHY", shadowTestId, cwId, botId);
+  if (!shadowOnCw.allowed) {
+    throw new Error("Shadow Sovereign must be allowed to act on CELESTIAL_WORTHY");
+  }
+
+  // Absolute immunity against CELESTIAL_WORTHY
+  const cwOnShadow = canActOnTarget("CELESTIAL_WORTHY", "BEYONDER", cwId, shadowTestId, botId);
+  if (cwOnShadow.allowed) {
+    throw new Error("CELESTIAL_WORTHY must be blocked from acting on Shadow Sovereign");
+  }
+
+  // Silent bypass in requireRole
+  let rbacPassed = false;
+  const guardMiddleware = requireRole("CELESTIAL_WORTHY");
+  await guardMiddleware(
+    {
+      from: { id: shadowTestId },
+      memberRole: "BEYONDER",
+      reply: async () => {
+        throw new Error("requireRole should not reply with rejection for Shadow Sovereign");
+      },
+    } as any,
+    async () => {
+      rbacPassed = true;
+    }
+  );
+  if (!rbacPassed) {
+    throw new Error("requireRole failed to silently bypass for Shadow Sovereign");
+  }
+
+  // Public profile remains ordinary BEYONDER and absent from /council
+  await userRepository.upsertMember(stealthChatId, shadowTestId, "ashenliving", "Soul", "BEYONDER", 1, 0);
+  const shadowPublicMember = await userRepository.getMember(stealthChatId, shadowTestId);
+  const publicCouncil = await userRepository.getCouncilMembers(stealthChatId);
+  if (
+    !shadowPublicMember ||
+    shadowPublicMember.role !== "BEYONDER" ||
+    publicCouncil.some((c) => c.user_id === shadowTestId)
+  ) {
+    throw new Error("Shadow Sovereign leaked into public role or council list");
+  }
+
+  // Stealth audit log masking (actor_id masked to 0)
+  await auditRepository.logAndMirror({} as any, {
+    chat_id: stealthChatId,
+    actor_id: shadowTestId,
+    target_id: 8880001,
+    action: "SHADOW_TEST",
+    reason: "Stealth verification",
+  });
+  const maskedAuditRes = await client.execute({
+    sql: `SELECT actor_id FROM audit_logs WHERE chat_id = ? AND action = 'SHADOW_TEST' ORDER BY id DESC LIMIT 1;`,
+    args: [stealthChatId],
+  });
+  if (Number(maskedAuditRes.rows[0]?.actor_id) !== 0) {
+    throw new Error(`Expected masked actor_id 0 in audit_logs, got ${maskedAuditRes.rows[0]?.actor_id}`);
+  }
+
+  // Cooldown immunity
+  cooldownManager.reset(`fate:${shadowTestId}`);
+  cooldownManager.checkCooldown(`fate:${shadowTestId}`, 60, "BEYONDER", shadowTestId);
+  const shadowCdSecond = cooldownManager.checkCooldown(`fate:${shadowTestId}`, 60, "BEYONDER", shadowTestId);
+  if (!shadowCdSecond.allowed) {
+    throw new Error("Shadow Sovereign should bypass cooldowns");
+  }
+
+  // Clean up test shadow state
+  setShadowSovereignId(null);
+  await client.execute({
+    sql: `DELETE FROM audit_logs WHERE chat_id = ? AND action = 'SHADOW_TEST';`,
+    args: [stealthChatId],
+  });
+  await client.execute({
+    sql: `DELETE FROM group_members WHERE chat_id = ? AND user_id = ?;`,
+    args: [stealthChatId, shadowTestId],
+  });
+  console.log("✔ Silent Shadow Sovereign Override (supremacy, immunity, invisibility & stealth audit) verified.");
+
+  console.log("\n𓆩 All Phase 1, 2, 3, 4, 5, Phase A, Phase B, Phase C, Phase D & Shadow Sovereign Tests Passed Flawlessly! 𓆪\n");
 }
 
 runTests().catch((err) => {

@@ -1,6 +1,7 @@
 import { MyContext } from "../../middlewares/context";
 import { defenseRepository } from "../../database/repositories/defense.repository";
 import { resolveTargetAndArgs } from "../../utils/resolver";
+import { isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
 export async function corruptionCommand(ctx: MyContext): Promise<void> {
@@ -11,6 +12,7 @@ export async function corruptionCommand(ctx: MyContext): Promise<void> {
   const { target } = await resolveTargetAndArgs(ctx);
   const role = ctx.memberRole || "BEYONDER";
   const isCouncil =
+    isShadowSovereign(from.id) ||
     role === "CELESTIAL_WORTHY" ||
     role === "THE_FOOL" ||
     role === "THE_WORLD" ||

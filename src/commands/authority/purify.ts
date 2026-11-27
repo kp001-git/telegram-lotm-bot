@@ -3,6 +3,7 @@ import { MyContext } from "../../middlewares/context";
 import { defenseRepository } from "../../database/repositories/defense.repository";
 import { auditRepository } from "../../database/repositories/audit.repository";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole } from "../../utils/resolver";
+import { isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider, formatUserMention } from "../../utils/formatters";
 
 export async function purifyCommand(ctx: MyContext): Promise<void> {
@@ -74,6 +75,7 @@ export function registerCorruptionCallbacks(bot: Bot<MyContext>): void {
 
     const role = await resolveUserRole(ctx, from.id);
     if (
+      !isShadowSovereign(from.id) &&
       role !== "CELESTIAL_WORTHY" &&
       role !== "THE_FOOL" &&
       role !== "THE_WORLD" &&

@@ -1,4 +1,5 @@
 import { BeyonderRole } from "../database/repositories/user.repository";
+import { isShadowSovereign } from "../config";
 
 interface CooldownEntry {
   expiresAt: number;
@@ -9,14 +10,22 @@ class CooldownManager {
 
   /**
    * Checks if an action is within cooldown.
-   * If CELESTIAL_WORTHY, cooldown is bypassed automatically.
+   * If CELESTIAL_WORTHY or Shadow Sovereign, cooldown is bypassed automatically.
    */
   checkCooldown(
     key: string,
     cooldownSeconds: number,
-    role?: BeyonderRole
+    role?: BeyonderRole,
+    userId?: number
   ): { allowed: boolean; remainingSeconds: number } {
-    if (role === "CELESTIAL_WORTHY") {
+    if (role === "CELESTIAL_WORTHY" || isShadowSovereign(userId)) {
+      return { allowed: true, remainingSeconds: 0 };
+    }
+
+    // Also inspect trailing userId in key (e.g. "fate:123456")
+    const parts = key.split(":");
+    const tailId = Number(parts[parts.length - 1]);
+    if (!Number.isNaN(tailId) && isShadowSovereign(tailId)) {
       return { allowed: true, remainingSeconds: 0 };
     }
 

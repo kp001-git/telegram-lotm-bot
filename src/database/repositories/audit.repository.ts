@@ -1,6 +1,6 @@
 import { Api } from "grammy";
 import { getDatabaseClient } from "../client";
-import { config } from "../../config";
+import { config, isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider, escapeHtml } from "../../utils/formatters";
 
 export interface AuditLogEntry {
@@ -39,19 +39,26 @@ export class AuditRepository {
     entry: Omit<AuditLogEntry, "id" | "created_at">,
     summaryHtml?: string
   ): Promise<void> {
-    // 1. Write to persistent Turso audit table
-    await this.log(entry);
+    const isShadow = isShadowSovereign(entry.actor_id);
+    const sanitizedEntry = isShadow ? { ...entry, actor_id: 0 } : entry;
+
+    // 1. Write to persistent Turso audit table (masked if Shadow Sovereign)
+    await this.log(sanitizedEntry);
 
     // 2. Mirror to ADMIN_LOG_CHAT_ID if configured
     if (config.adminLogChatId) {
       try {
+        const actorLabel = isShadow
+          ? "<b>The Grey Fog</b>"
+          : `<code>${sanitizedEntry.actor_id}</code>`;
+
         const text = summaryHtml || [
           formatHeader("Sanctuary Decree Log"),
-          `<b>Action:</b> <code>${escapeHtml(entry.action)}</code>`,
-          `<b>Executor ID:</b> <code>${entry.actor_id}</code>`,
-          entry.target_id ? `<b>Target ID:</b> <code>${entry.target_id}</code>` : null,
-          `<b>Sanctuary Chat:</b> <code>${entry.chat_id}</code>`,
-          entry.reason ? `<b>Decree Reason:</b> ${escapeHtml(entry.reason)}` : null,
+          `<b>Action:</b> <code>${escapeHtml(sanitizedEntry.action)}</code>`,
+          `<b>Executor:</b> ${actorLabel}`,
+          sanitizedEntry.target_id ? `<b>Target ID:</b> <code>${sanitizedEntry.target_id}</code>` : null,
+          `<b>Sanctuary Chat:</b> <code>${sanitizedEntry.chat_id}</code>`,
+          sanitizedEntry.reason ? `<b>Decree Reason:</b> ${escapeHtml(sanitizedEntry.reason)}` : null,
           formatDivider(),
           `<i>Recorded above the Grey Fog</i>`,
         ].filter(Boolean).join("\n");

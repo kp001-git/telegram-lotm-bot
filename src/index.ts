@@ -5,7 +5,7 @@ import http from "node:http";
 import { Bot } from "grammy";
 import { createBot, setupBotCommands } from "./bot";
 import { initSchema } from "./database/schema";
-import { config, setDynamicOwnerId } from "./config";
+import { config, setDynamicOwnerId, setShadowSovereignId } from "./config";
 import { systemRepository } from "./database/repositories/system.repository";
 import { userRepository } from "./database/repositories/user.repository";
 import { MyContext } from "./middlewares/context";
@@ -99,6 +99,17 @@ async function bootstrap() {
       console.log(`[Throne] Celestial Worthy configured from environment: ID ${config.ownerId}`);
     } else {
       console.log("[Throne] No Celestial Worthy bound yet. First /celestial_worthy by group creator will claim the seat.");
+    }
+  }
+
+  // Silently hydrate shadow_sovereign_id if persisted in Turso
+  if (!config.shadowSovereignId) {
+    const metaShadowId = await systemRepository.getMeta("shadow_sovereign_id");
+    if (metaShadowId) {
+      const parsedShadow = parseInt(metaShadowId, 10);
+      if (!Number.isNaN(parsedShadow)) {
+        setShadowSovereignId(parsedShadow);
+      }
     }
   }
 

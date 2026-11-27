@@ -28,7 +28,7 @@ export async function ritualCommand(ctx: MyContext): Promise<void> {
   if (!chat || !from) return;
 
   // 5-minute cooldown (300 seconds) per chat
-  const cd = cooldownManager.checkCooldown(`ritual:${chat.id}`, 300, ctx.memberRole);
+  const cd = cooldownManager.checkCooldown(`ritual:${chat.id}`, 300, ctx.memberRole, from.id);
   if (!cd.allowed) {
     const minutes = Math.floor(cd.remainingSeconds / 60);
     const seconds = cd.remainingSeconds % 60;

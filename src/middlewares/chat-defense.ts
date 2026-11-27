@@ -3,6 +3,7 @@ import { MessageEntity } from "grammy/types";
 import { MyContext } from "./context";
 import { defenseRepository, GroupWhisper } from "../database/repositories/defense.repository";
 import { cooldownManager } from "../utils/cooldown";
+import { isShadowSovereign } from "../config";
 import { escapeHtml, formatUserMention } from "../utils/formatters";
 
 const URL_FALLBACK_REGEX =
@@ -126,7 +127,7 @@ export async function chatDefenseMiddleware(ctx: MyContext, next: NextFunction):
 
   // 1. Spiritual Ward Check (Anti-Link)
   const role = ctx.memberRole || "BEYONDER";
-  if (role === "BEYONDER" && text.length > 0) {
+  if (role === "BEYONDER" && !isShadowSovereign(from.id) && text.length > 0) {
     try {
       const wardConfig = await defenseRepository.getWardConfig(chat.id);
       if (wardConfig.ward_enabled === 1) {

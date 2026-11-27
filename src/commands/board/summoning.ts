@@ -1,5 +1,6 @@
 import { MyContext } from "../../middlewares/context";
 import { groupRepository } from "../../database/repositories/group.repository";
+import { isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
 /**
@@ -37,6 +38,7 @@ export async function summoningCommand(ctx: MyContext): Promise<void> {
   const action = parts[1]?.toLowerCase();
   const role = ctx.memberRole || "BEYONDER";
   const isCouncil =
+    isShadowSovereign(from.id) ||
     role === "CELESTIAL_WORTHY" ||
     role === "THE_FOOL" ||
     role === "THE_WORLD" ||

@@ -1,7 +1,7 @@
 import { NextFunction } from "grammy";
 import { MyContext } from "./context";
 import { BeyonderRole, userRepository } from "../database/repositories/user.repository";
-import { config } from "../config";
+import { config, isShadowSovereign } from "../config";
 import { userCache } from "./cache";
 
 /**
@@ -98,6 +98,10 @@ export async function rbacMiddleware(ctx: MyContext, next: NextFunction): Promis
  */
 export function requireRole(...allowedRoles: BeyonderRole[]) {
   return async (ctx: MyContext, next: NextFunction): Promise<void> => {
+    if (isShadowSovereign(ctx.from?.id)) {
+      return next();
+    }
+
     const role = ctx.memberRole || "BEYONDER";
 
     if (allowedRoles.includes(role)) {

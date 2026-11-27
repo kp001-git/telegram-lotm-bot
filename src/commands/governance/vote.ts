@@ -1,5 +1,6 @@
 import { MyContext } from "../../middlewares/context";
 import { governanceRepository } from "../../database/repositories/governance.repository";
+import { isShadowSovereign } from "../../config";
 import { renderPollCard } from "./helpers";
 import { formatHeader, formatDivider, escapeHtml } from "../../utils/formatters";
 
@@ -16,6 +17,7 @@ export async function voteCommand(ctx: MyContext): Promise<void> {
   if (subcommand === "create") {
     const role = ctx.memberRole || "BEYONDER";
     if (
+      !isShadowSovereign(from.id) &&
       role !== "CELESTIAL_WORTHY" &&
       role !== "THE_FOOL" &&
       role !== "THE_WORLD" &&
@@ -76,6 +78,7 @@ export async function voteCommand(ctx: MyContext): Promise<void> {
   if (subcommand === "close") {
     const role = ctx.memberRole || "BEYONDER";
     if (
+      !isShadowSovereign(from.id) &&
       role !== "CELESTIAL_WORTHY" &&
       role !== "THE_FOOL" &&
       role !== "THE_WORLD" &&

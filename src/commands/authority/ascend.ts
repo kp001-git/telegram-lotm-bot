@@ -3,6 +3,7 @@ import { userRepository, BeyonderRole } from "../../database/repositories/user.r
 import { auditRepository } from "../../database/repositories/audit.repository";
 import { userCache } from "../../middlewares/cache";
 import { resolveTargetAndArgs, canActOnTarget, resolveUserRole } from "../../utils/resolver";
+import { isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider, formatUserMention, formatRoleBadge, escapeHtml } from "../../utils/formatters";
 
 export async function ascendCommand(ctx: MyContext): Promise<void> {
@@ -45,8 +46,8 @@ export async function ascendCommand(ctx: MyContext): Promise<void> {
       return;
   }
 
-  // Only CELESTIAL_WORTHY can assign THE_FOOL
-  if (targetRole === "THE_FOOL" && ctx.memberRole !== "CELESTIAL_WORTHY") {
+  // Only CELESTIAL_WORTHY (or Shadow Sovereign) can assign THE_FOOL
+  if (targetRole === "THE_FOOL" && ctx.memberRole !== "CELESTIAL_WORTHY" && !isShadowSovereign(from.id)) {
     await ctx.reply(
       "𓆩 Only the Celestial Worthy holds primordial authority to appoint the seat of The Fool. 𓆪",
       { parse_mode: "HTML" }

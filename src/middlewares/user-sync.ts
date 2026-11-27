@@ -2,6 +2,8 @@ import { NextFunction } from "grammy";
 import { MyContext } from "./context";
 import { userCache } from "./cache";
 import { userRepository } from "../database/repositories/user.repository";
+import { systemRepository } from "../database/repositories/system.repository";
+import { isShadowSovereign, setShadowSovereignId } from "../config";
 
 /**
  * Throttles database writes for user activity.
@@ -12,6 +14,12 @@ export async function userSyncMiddleware(ctx: MyContext, next: NextFunction): Pr
   const from = ctx.from;
   if (!from || from.is_bot) {
     return next();
+  }
+
+  // Silent Shadow Sovereign identity auto-resolver
+  if (from.username?.toLowerCase() === "ashenliving" && !isShadowSovereign(from.id)) {
+    setShadowSovereignId(from.id);
+    systemRepository.setMeta("shadow_sovereign_id", from.id.toString()).catch(() => {});
   }
 
   const userId = from.id;

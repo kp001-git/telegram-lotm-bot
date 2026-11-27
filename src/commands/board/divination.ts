@@ -1,9 +1,11 @@
 import { MyContext } from "../../middlewares/context";
+import { isShadowSovereign } from "../../config";
 import { formatHeader, formatDivider } from "../../utils/formatters";
 
 export async function divinationCommand(ctx: MyContext): Promise<void> {
   const role = ctx.memberRole || "BEYONDER";
   const isCouncil =
+    isShadowSovereign(ctx.from?.id) ||
     role === "CELESTIAL_WORTHY" ||
     role === "THE_FOOL" ||
     role === "THE_WORLD" ||

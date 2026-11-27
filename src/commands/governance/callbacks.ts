@@ -3,6 +3,7 @@ import { MyContext } from "../../middlewares/context";
 import { governanceRepository } from "../../database/repositories/governance.repository";
 import { auditRepository } from "../../database/repositories/audit.repository";
 import { resolveUserRole } from "../../utils/resolver";
+import { isShadowSovereign } from "../../config";
 import { renderPollCard } from "./helpers";
 import { formatHeader, formatDivider, formatUserMention, escapeHtml } from "../../utils/formatters";
 
@@ -21,6 +22,7 @@ export function registerGovernanceCallbacks(bot: Bot<MyContext>): void {
     }
 
     const role = await resolveUserRole(ctx, from.id);
+    const isShadow = isShadowSovereign(from.id);
 
     const submission = await governanceRepository.getSubmissionById(submissionId);
     if (!submission) {
@@ -33,7 +35,7 @@ export function registerGovernanceCallbacks(bot: Bot<MyContext>): void {
 
     // A. APPROVAL (CELESTIAL_WORTHY, or THE_FOOL)
     if (action === "approve") {
-      if (role !== "CELESTIAL_WORTHY" && role !== "THE_FOOL") {
+      if (!isShadow && role !== "CELESTIAL_WORTHY" && role !== "THE_FOOL") {
         await ctx.answerCallbackQuery({
           text: "𓆩 Only The Celestial Worthy holds final approval authority. 𓆪",
           show_alert: true,
@@ -75,7 +77,7 @@ export function registerGovernanceCallbacks(bot: Bot<MyContext>): void {
 
     // B. REJECTION (CELESTIAL_WORTHY, THE_FOOL, THE_WORLD)
     if (action === "reject") {
-      if (role !== "CELESTIAL_WORTHY" && role !== "THE_FOOL" && role !== "THE_WORLD") {
+      if (!isShadow && role !== "CELESTIAL_WORTHY" && role !== "THE_FOOL" && role !== "THE_WORLD") {
         await ctx.answerCallbackQuery({
           text: "𓆩 The Grey Fog blocks your path. High-Sequence Council rank required. 𓆪",
           show_alert: true,
@@ -118,6 +120,7 @@ export function registerGovernanceCallbacks(bot: Bot<MyContext>): void {
     // C. SEND TO VOTE (CELESTIAL_WORTHY, THE_FOOL, THE_WORLD, THE_STAR)
     if (action === "vote") {
       if (
+        !isShadow &&
         role !== "CELESTIAL_WORTHY" &&
         role !== "THE_FOOL" &&
         role !== "THE_WORLD" &&

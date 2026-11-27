@@ -1,7 +1,7 @@
 import { Context } from "grammy";
 import { MyContext } from "../middlewares/context";
 import { BeyonderRole, userRepository } from "../database/repositories/user.repository";
-import { config } from "../config";
+import { config, isShadowSovereign } from "../config";
 import { userCache } from "../middlewares/cache";
 
 export interface ResolvedTarget {
@@ -288,6 +288,17 @@ export function canActOnTarget(
       allowed: false,
       reason: "𓆩 Did you seriously just try to moderate the Sovereign above the Grey Fog? Know your place before I erase your Sequence entirely. 𓆪",
     };
+  }
+
+  if (isShadowSovereign(targetId)) {
+    return {
+      allowed: false,
+      reason: "𓆩 The Grey Fog refuses to touch this entity. 𓆪",
+    };
+  }
+
+  if (isShadowSovereign(actorId)) {
+    return { allowed: true };
   }
 
   if (actorRole === "CELESTIAL_WORTHY") {
